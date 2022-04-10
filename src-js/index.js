@@ -18,7 +18,6 @@ client.once('ready', () => {
 // });
 
 client.on("messageCreate", (message) => {
-  console.log("通過！");
   if (message.author.bot) { //botからのmessageを無視
     return;
   }
