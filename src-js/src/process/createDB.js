@@ -44,7 +44,11 @@ db.serialize(() => {
     `);
 
     /* ロールの追加 */
-    db.run(`INSERT INTO r_roles(r_id, r_name) values(?,?)`);
+    db.run(`INSERT INTO r_roles VALUES('クランマスター')`);
+    db.run(`INSERT INTO r_roles VALUES('副司令官')`);
+    db.run(`INSERT INTO r_roles VALUES('士官')`);
+    db.run(`INSERT INTO r_roles VALUES('軍曹')`);
+    db.run(`INSERT INTO r_roles VALUES('クランメンバー')`);
     // db.run("drop table if exists members");
     // db.run("create table if not exists members(name,age)");
     // db.run("insert into members(name,age) values(?,?)", "hoge", 33);
