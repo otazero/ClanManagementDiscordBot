@@ -7,6 +7,7 @@
     "lint:fix": "standard --fix \"src/**/*.js\""
   },
   "dependencies": {
+    "cheerio-httpcli": "^0.8.3",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0"
   },
