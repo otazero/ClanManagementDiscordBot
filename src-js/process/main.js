@@ -1,3 +1,3 @@
 var app = require('./scraping');
 
-app.abc();
+app.scraping();

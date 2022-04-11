@@ -9,7 +9,7 @@ function cfDecodeEmail(encodedString) {
 };
 
 
-exports.abc = function(){
+exports.scraping = function(){
     var fs = require('fs');
     require('dotenv').config();
 
@@ -77,7 +77,7 @@ exports.abc = function(){
         });
         /* なぜか値渡しできなかったので... */
         let simpleData = {data: scrapingData};
-        fs.writeFile('hoge.json', JSON.stringify(simpleData, null, '    '), (err)=>{
+        fs.writeFile('./data/hoge.json', JSON.stringify(simpleData, null, '    '), (err)=>{
             if(err) console.log(`error!::${err}`);
         });
     });
