@@ -13,17 +13,17 @@ db.serialize(() => {
         )`);
     
     /* wtテーブル */
-    db.run(`CREATE TABLE t_wt_members
+    db.run(`CREATE TABLE t_wt_members(
         t_user_id INTEGER PRIMARY KEY AUTOINCREMENT,
         t_ign TEXT NOT NULL UNIQUE,
         r_id INTEGER NOT NULL,
         t_enter_at TEXT NOT NULL DEFAULT CURRENT_DATE,
         t_left_at TEXT,
         t_is_flag INTEGER NOT NULL DEFAULT 1
-    `);
+    )`);
 
     /* Discordテーブル */    
-    db.run(`CREATE TABLE d_discord_members
+    db.run(`CREATE TABLE d_discord_members(
         d_user_id INTEGER PRIMARY KEY,
         d_name TEXT NOT NULL,
         w_user_id INTEGER,
@@ -35,20 +35,20 @@ db.serialize(() => {
         d_left_at TEXT,
         d_is_flag INTEGER NOT NULL DEFAULT 1,
         d_sub_id INTEGER
-    `);
+    )`);
 
     /*Roleテーブル*/
-    db.run(`CREATE TABLE r_roles
+    db.run(`CREATE TABLE r_roles(
         r_id INTEGER PRIMARY KEY AUTOINCREMENT,
         r_name TEXT NOT NULL UNIQUE
-    `);
+    )`);
 
     /* ロールの追加 */
-    db.run(`INSERT INTO r_roles VALUES('クランマスター')`);
-    db.run(`INSERT INTO r_roles VALUES('副司令官')`);
-    db.run(`INSERT INTO r_roles VALUES('士官')`);
-    db.run(`INSERT INTO r_roles VALUES('軍曹')`);
-    db.run(`INSERT INTO r_roles VALUES('クランメンバー')`);
+    db.run(`INSERT INTO r_roles(r_name) VALUES('クランマスター')`);
+    db.run(`INSERT INTO r_roles(r_name) VALUES('副司令官')`);
+    db.run(`INSERT INTO r_roles(r_name) VALUES('士官')`);
+    db.run(`INSERT INTO r_roles(r_name) VALUES('軍曹')`);
+    db.run(`INSERT INTO r_roles(r_name) VALUES('クランメンバー')`);
     // db.run("drop table if exists members");
     // db.run("create table if not exists members(name,age)");
     // db.run("insert into members(name,age) values(?,?)", "hoge", 33);
