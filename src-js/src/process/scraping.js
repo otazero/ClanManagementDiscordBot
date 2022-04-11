@@ -16,7 +16,6 @@ exports.scraping = function(){
     var client = require('cheerio-httpcli');
 
     const URL = process.env.CLAN_SITE;
-    
     /* スクレイピング開始 */
     client.fetch(URL, function(e, $, res, body){
         /* エラー表示 */
@@ -77,7 +76,7 @@ exports.scraping = function(){
         });
         /* なぜか値渡しできなかったので... */
         let simpleData = {data: scrapingData};
-        fs.writeFile('./data/hoge.json', JSON.stringify(simpleData, null, '    '), (err)=>{
+        fs.writeFile('./data/scrapingData.json', JSON.stringify(simpleData, null, '    '), (err)=>{
             if(err) console.log(`error!::${err}`);
         });
     });
