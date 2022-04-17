@@ -1,68 +1,45 @@
-const sqlite3 = require("sqlite3");
-const db = new sqlite3.Database("./data/clandb.sqlite3");
+const mysql = require("mysql2/promise");
+require('dotenv').config();
 
-db.serialize(() => {
-    /* wotbテーブル */
-    db.run(`CREATE TABLE w_wotb_members(
-        w_user_id INTEGER PRIMARY KEY,
-        w_ign TEXT NOT NULL UNIQUE,
-        r_id INTEGER NOT NULL,
-        w_enter_at TEXT NOT NULL,
-        w_left_at TEXT,
-        w_is_flag INTEGER NOT NULL DEFAULT 1
-        )`);
-    
-    /* wtテーブル */
-    db.run(`CREATE TABLE t_wt_members(
-        t_user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        t_ign TEXT NOT NULL UNIQUE,
-        r_id INTEGER NOT NULL,
-        t_enter_at TEXT NOT NULL DEFAULT CURRENT_DATE,
-        t_left_at TEXT,
-        t_is_flag INTEGER NOT NULL DEFAULT 1
-    )`);
+const db_setting = {
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: 'clandb',
+};
 
-    /* Discordテーブル */    
-    db.run(`CREATE TABLE d_discord_members(
-        d_user_id INTEGER PRIMARY KEY,
-        d_name TEXT NOT NULL,
-        w_user_id INTEGER,
-        t_user_id INTEGER,
-        r_id INTEGER NOT NULL,
-        d_nick TEXT,
-        d_ign TEXT NOT NULL,
-        d_enter_at TEXT NOT NULL,
-        d_left_at TEXT,
-        d_is_flag INTEGER NOT NULL DEFAULT 1,
-        d_sub_id INTEGER
-    )`);
+(async () => {
 
-    /*Roleテーブル*/
-    db.run(`CREATE TABLE r_roles(
-        r_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        r_name TEXT NOT NULL UNIQUE
-    )`);
+    try {
+        const con = await mysql.createConnection(db_setting);
+        
+        /* wotbメンバーテーブル */
+        await con.query(`
+            CREATE TABLE w_wotb_members(
+                w_user_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+                w_ign VARCHAR(16) UNIQUE NOT NULL,
+                r_id TINYINT UNSIGNED NOT NULL,
+                w_enter_at DATETIME,
+                w_left_at DATE,
+                w_is_flag BOOLEAN DEFAULT true NOT NULL,
+                CONSTRAINT fk_r_id
+                    FOREIGN KEY (r_id) 
+                    REFERENCES r_roles (r_id)
+                    ON DELETE RESTRICT ON UPDATE CASCADE)
+        `);
+        // await con.query("insert into members(id,name) values(?,?)", [1, "hoge"]);
+        // await con.query("insert into members(id,name) values(?,?)", [2, "foo"]);
 
-    /* ロールの追加 */
-    db.run(`INSERT INTO r_roles(r_name) VALUES('クランマスター')`);
-    db.run(`INSERT INTO r_roles(r_name) VALUES('副司令官')`);
-    db.run(`INSERT INTO r_roles(r_name) VALUES('士官')`);
-    db.run(`INSERT INTO r_roles(r_name) VALUES('軍曹')`);
-    db.run(`INSERT INTO r_roles(r_name) VALUES('クランメンバー')`);
-    // db.run("drop table if exists members");
-    // db.run("create table if not exists members(name,age)");
-    // db.run("insert into members(name,age) values(?,?)", "hoge", 33);
-    // db.run("insert into members(name,age) values(?,?)", "foo", 44);
-    // db.run("update members set age = ? where name = ?", 55, "foo");
-    // db.each("select * from members", (err, row) => {
-    //     console.log(`${row.name} ${row.age}`);
-    // });
-    // db.all("select * from members", (err, rows) => {
-    //     console.log(JSON.stringify(rows));
-    // });
-    // db.get("select count(*) from members", (err, count) => {
-    //     console.log(count["count(*)"]);
-    // })
-});
+        // const [rows, fields] = await con.query("select * from members");
+        // for (const row of rows) {
+        //     console.log(`id=${row.id}, name=${row.name}`);
+        // }
 
-db.close();
+        await con.end();
+
+
+    } catch (e) {
+        console.log(e);
+    }
+
+})();
