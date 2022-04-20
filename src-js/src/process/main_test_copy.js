@@ -12,7 +12,7 @@ console.log("hi");
 (async () => {
     try{
         await scraping();
-        const data = require('../../data/scrapingData.json');
+        const data = require('./data/scrapingData.json');
         console.log(data.data);
         console.log("3番目");
         try {
@@ -22,6 +22,7 @@ console.log("hi");
         } catch (e) {
             console.log(e);
         }
+        console.log(y);
     } catch (e) {
         console.log(e);
     }
