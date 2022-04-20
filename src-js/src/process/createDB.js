@@ -112,35 +112,38 @@ const db_setting = {
     
                 )
             `);
-        await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES(, ,)`);
-        await con.query(`insert into r_roles(r_name, r_dis_id) 
+        // await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES(, ,)`);
+        const [a, b] = await con.query(`insert into r_roles(r_name, r_dis_id) 
                             values  ('クランマスター',491578007392092170),
                                     ('副司令官',483571692774621194),
                                     ('クランメンバー',558947013744525313),
                                     ('元老',483571690429743115),
                                     ('ゲスト',746985465269452820),
-                                    ('自己紹介未済',617291907361538068)
+                                    ('自己紹介未済',617291907361538068),
+                                    ('士官',NULL),
+                                    ('軍曹',NULL)
                                     `);
         // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['副司令官',483571692774621194]);
         // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['クランメンバー',558947013744525313]);
         // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['元老',483571690429743115]);
         // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['ゲスト',746985465269452820]);
-        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['自己紹介未済',617291907361538068]);
+        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['テスト',5555555555]);
         // await con.query("insert into members(id,name) values(?,?)", [2, "foo"]);
 
         // const [rows, fields] = await con.query("select * from members");
         // for (const row of rows) {
         //     console.log(`id=${row.id}, name=${row.name}`);
         // }
+        
+
 
         await con.end();
-
-
     } catch (e) {
         console.log(e);
     }
 
 })();
+
 
 /* メモ */
 
