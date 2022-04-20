@@ -8,6 +8,11 @@ function cfDecodeEmail(encodedString) {
     return email;
 };
 
+/* 入隊日表示をddmmyyyyからyyyymmddにチェンジ */
+function date_change(ddmmyyyy){
+    temp = ddmmyyyy.split('.')
+    return(temp[2]+"-"+temp[1]+"-"+temp[0])
+};
 
 exports.scraping = function(){
     var fs = require('fs');
@@ -59,16 +64,33 @@ exports.scraping = function(){
                     }
                     break;
                 case 2:
-                    scrapingData[Math.floor(allCount/6)].personalClanRating = lineData;
+                    scrapingData[Math.floor(allCount/6)].personalClanRating = Number(lineData);
                     break;
                 case 3:
-                    scrapingData[Math.floor(allCount/6)].activity = lineData;
+                    scrapingData[Math.floor(allCount/6)].activity = Number(lineData);
                     break;
                 case 4:
                     scrapingData[Math.floor(allCount/6)].role = lineData;
+                        switch(lineData){
+                            case 'Private':
+                                scrapingData[Math.floor(allCount/6)].roleid = 3;
+                                break;
+                            case 'Commander':
+                                scrapingData[Math.floor(allCount/6)].roleid = 1;
+                                break;
+                            case 'Deputy':
+                                scrapingData[Math.floor(allCount/6)].roleid = 2;
+                                break;
+                            case 'Officer':
+                                scrapingData[Math.floor(allCount/6)].roleid = 7;
+                                break;
+                            case 'Sergeant':
+                                scrapingData[Math.floor(allCount/6)].roleid = 8;
+                                break;
+                        }
                     break;
                 case 5:
-                    scrapingData[Math.floor(allCount/6)].dateOfEntry = lineData;
+                    scrapingData[Math.floor(allCount/6)].dateOfEntry = date_change(lineData);
                     lineCount = -1;
                     break;
             }
@@ -79,5 +101,6 @@ exports.scraping = function(){
         fs.writeFile('./data/scrapingData.json', JSON.stringify(simpleData, null, '    '), (err)=>{
             if(err) console.log(`error!::${err}`);
         });
+        console.log("Sした");
     });
 };
