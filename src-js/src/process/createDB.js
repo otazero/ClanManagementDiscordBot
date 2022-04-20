@@ -51,7 +51,7 @@ const db_setting = {
                 t_enter_at DATE,
                 t_left_at DATE,
                 t_is_flag BOOLEAN DEFAULT true NOT NULL,
-                t_all_active INT NOT NULL,
+                t_all_active INT DEFAULT 0 NOT NULL,
                 INDEX rt_index(r_id),
                 CONSTRAINT fk_rt_id_
                     FOREIGN KEY (r_id) 
@@ -112,12 +112,20 @@ const db_setting = {
     
                 )
             `);
-        await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['クランマスター',491578007392092170]);
-        await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['副司令官',483571692774621194]);
-        await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['クランメンバー',558947013744525313]);
-        await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['元老',483571690429743115]);
-        await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['ゲスト',746985465269452820]);
-        await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['自己紹介未済',617291907361538068]);
+        await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES(, ,)`);
+        await con.query(`insert into r_roles(r_name, r_dis_id) 
+                            values  ('クランマスター',491578007392092170),
+                                    ('副司令官',483571692774621194),
+                                    ('クランメンバー',558947013744525313),
+                                    ('元老',483571690429743115),
+                                    ('ゲスト',746985465269452820),
+                                    ('自己紹介未済',617291907361538068)
+                                    `);
+        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['副司令官',483571692774621194]);
+        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['クランメンバー',558947013744525313]);
+        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['元老',483571690429743115]);
+        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['ゲスト',746985465269452820]);
+        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['自己紹介未済',617291907361538068]);
         // await con.query("insert into members(id,name) values(?,?)", [2, "foo"]);
 
         // const [rows, fields] = await con.query("select * from members");
