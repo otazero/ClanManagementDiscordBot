@@ -23,8 +23,12 @@ const db_setting = {
         // hairetu = [ スクレイピングのreturn, なし];
         const hairetu = await Promise.all([scraping(), buildDB(con)]);
         // スクレイピングのデータをDBに一括登録
-        await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES ${hairetu[0]}`);
-
+        await Promise.all([
+            // 基本情報
+            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${hairetu[0]['info']}`),
+            // アクティブ情報
+            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${hairetu[0]['activity']}`)
+        ]);
         // const [rows, fields] = await con.query("select * from members");
         // for (const row of rows) {
         //     console.log(`id=${row.id}, name=${row.name}`);
@@ -38,18 +42,21 @@ const db_setting = {
 
 // スクレイピング 
 async function scraping(){
-    let values = '';
+    let valuesInfo = '';
+    let valuesActive = '';
     const list = await scrape.fetch(clanInfoURL);
     const listLength = list.length;
     // バルクinsertの用意
     // 一個目の要素は表のヘッダーなのでいらない
     for(let i = 1; i < listLength; i++){
-        values += `('${list[i].player}',${list[i].roleid},'${list[i].dateOfEntry}')`;
+        valuesInfo += `('${list[i].player}',${list[i].roleid},'${list[i].dateOfEntry}',${list[i].activity})`;
+        valuesActive += `('${i}',${list[i].activity})`;
         if(i !== listLength - 1){
-            values += ',';
+            valuesInfo += ',';
+            valuesActive += ',';
         }
     }
-    return values;
+    return {info:valuesInfo, activity:valuesActive};
 }
 
 // DBのテーブル作成
