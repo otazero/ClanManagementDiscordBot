@@ -8,6 +8,14 @@ npm install
 
 ## スクリプト
 
+### createdb
+
+ボット起動前に行う(データベース構築等)
+
+```
+npm run createdb
+```
+
 ### start
 
 ボットを起動するよ
