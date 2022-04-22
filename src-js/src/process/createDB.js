@@ -1,6 +1,11 @@
 const mysql = require("mysql2/promise");
+const scrape = require('./scrape');
 require('dotenv').config();
 
+// メンバー一覧表示サイトURL
+const clanInfoURL = process.env.CLAN_SITE;
+
+// DBのログインに必要な情報
 const db_setting = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -11,20 +16,57 @@ const db_setting = {
 (async () => {
 
     try {
+        // DBに接続
         const con = await mysql.createConnection(db_setting);
+        
+        // スクレイピングとDBのテーブル作成を並列実行(理想)
+        // hairetu = [ スクレイピングのreturn, なし];
+        const hairetu = await Promise.all([scraping(), buildDB(con)]);
+        // スクレイピングのデータをDBに一括登録
+        await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES ${hairetu[0]}`);
 
+        // const [rows, fields] = await con.query("select * from members");
+        // for (const row of rows) {
+        //     console.log(`id=${row.id}, name=${row.name}`);
+        // }
+        await con.end();
+    } catch (e) {
+        console.log(e);
+    }
+
+})();
+
+// スクレイピング 
+async function scraping(){
+    let values = '';
+    const list = await scrape.fetch(clanInfoURL);
+    const listLength = list.length;
+    // バルクinsertの用意
+    // 一個目の要素は表のヘッダーなのでいらない
+    for(let i = 1; i < listLength; i++){
+        values += `('${list[i].player}',${list[i].roleid},'${list[i].dateOfEntry}')`;
+        if(i !== listLength - 1){
+            values += ',';
+        }
+    }
+    return values;
+}
+
+// DBのテーブル作成
+async function buildDB(con){
+    // 並列して5つテーブルを作る(理想)
+    await Promise.all([
         /* 役職テーブル */
-        await con.query(`
+        con.query(`
             CREATE TABLE IF NOT EXISTS r_roles
             (
                 r_id TINYINT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
                 r_name VARCHAR(10) UNIQUE NOT NULL,
                 r_dis_id BIGINT UNIQUE
             )
-        `);
-
+        `),
         /* wotbメンバーテーブル */
-        await con.query(`
+        con.query(`
             CREATE TABLE IF NOT EXISTS w_wotb_members
             (
                 w_user_id INT UNSIGNED NOT NULL PRIMARY KEY,
@@ -39,10 +81,10 @@ const db_setting = {
                         REFERENCES r_roles (r_id)
                         ON DELETE RESTRICT ON UPDATE CASCADE
             )
-        `);
+        `),
 
         /* WTメンバーテーブル */
-        await con.query(`
+        con.query(`
             CREATE TABLE IF NOT EXISTS t_wt_members
             (
                 t_user_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -58,10 +100,10 @@ const db_setting = {
                         REFERENCES r_roles (r_id)
                         ON DELETE RESTRICT ON UPDATE CASCADE
             )
-        `);
+        `),
 
         /* Discordメンバーテーブル */
-        await con.query(`
+        con.query(`
             CREATE TABLE IF NOT EXISTS d_discord_members
             (
                 d_user_id BIGINT NOT NULL PRIMARY KEY,
@@ -75,7 +117,7 @@ const db_setting = {
                 d_left_at DATE,
                 d_is_flag BOOLEAN DEFAULT true NOT NULL,
                 d_sub_id BIGINT UNIQUE,
-
+                
                 INDEX wd_index(w_user_id),
                 INDEX td_index(t_user_id),
                 INDEX rd_index(r_id),
@@ -95,55 +137,36 @@ const db_setting = {
                         REFERENCES t_wt_members (t_user_id)
                         ON DELETE RESTRICT ON UPDATE CASCADE
             )
-        `);
-        
-            /* アクティブテーブル */
-            await con.query(`
-                CREATE TABLE IF NOT EXISTS wt_actives
-                (
-                    t_user_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
-                    wt_active SMALLINT NOT NULL,
-                    wt_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    INDEX wta_index_index(t_user_id),
-                    CONSTRAINT fk_wt_active
-                        FOREIGN KEY (t_user_id) 
-                            REFERENCES t_wt_members (t_user_id)
-                            ON DELETE RESTRICT ON UPDATE CASCADE
-    
-                )
-            `);
-        // await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES(, ,)`);
-        const [a, b] = await con.query(`insert into r_roles(r_name, r_dis_id) 
-                            values  ('クランマスター',491578007392092170),
-                                    ('副司令官',483571692774621194),
-                                    ('クランメンバー',558947013744525313),
-                                    ('元老',483571690429743115),
-                                    ('ゲスト',746985465269452820),
-                                    ('自己紹介未済',617291907361538068),
-                                    ('士官',NULL),
-                                    ('軍曹',NULL)
-                                    `);
-        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['副司令官',483571692774621194]);
-        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['クランメンバー',558947013744525313]);
-        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['元老',483571690429743115]);
-        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['ゲスト',746985465269452820]);
-        // await con.query("insert into r_roles(r_name, r_dis_id) values(?,?)", ['テスト',5555555555]);
-        // await con.query("insert into members(id,name) values(?,?)", [2, "foo"]);
+        `),
+        /* アクティブテーブル */
+        con.query(`
+            CREATE TABLE IF NOT EXISTS wt_actives
+            (
+                t_user_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
+                wt_active SMALLINT NOT NULL,
+                wt_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX wta_index_index(t_user_id),
+                CONSTRAINT fk_wt_active
+                    FOREIGN KEY (t_user_id) 
+                        REFERENCES t_wt_members (t_user_id)
+                        ON DELETE RESTRICT ON UPDATE CASCADE
 
-        // const [rows, fields] = await con.query("select * from members");
-        // for (const row of rows) {
-        //     console.log(`id=${row.id}, name=${row.name}`);
-        // }
-        
-
-
-        await con.end();
-    } catch (e) {
-        console.log(e);
-    }
-
-})();
-
+            )
+        `)
+    ]);
+    // 役職データを登録
+    await con.query(`
+            INSERT INTO r_roles(r_name, r_dis_id) 
+            VALUES  ('クランマスター',491578007392092170),
+                    ('副司令官',483571692774621194),
+                    ('クランメンバー',558947013744525313),
+                    ('元老',483571690429743115),
+                    ('ゲスト',746985465269452820),
+                    ('自己紹介未済',617291907361538068),
+                    ('士官',NULL),
+                    ('軍曹',NULL)
+    `);
+};
 
 /* メモ */
 
