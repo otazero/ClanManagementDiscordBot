@@ -1,5 +1,10 @@
 let scrapingFile = require('./scrape');
 
-exports.something = function(){
-    
-}
+function something(){
+
+};
+
+
+module.exports = {
+    something
+};
