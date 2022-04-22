@@ -4,12 +4,14 @@
   "scripts": {
     "start": "node ./src/index.js",
     "lint": "standard \"src/**/*.js\"",
-    "lint:fix": "standard --fix \"src/**/*.js\""
+    "lint:fix": "standard --fix \"src/**/*.js\"",
+    "createdb": "node ./src/process/createDB.js"
   },
   "dependencies": {
     "cheerio-httpcli": "^0.8.3",
     "discord.js": "^13.6.0",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "mysql2": "^2.3.3"
   },
   "devDependencies": {
     "standard": "^16.0.4"

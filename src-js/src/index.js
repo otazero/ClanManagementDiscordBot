@@ -1,4 +1,5 @@
 require('dotenv').config();
+let mainApp = require('./process/main');
 
 const { Client } = require('discord.js');
 const token = process.env.BOT_TOKEN;
@@ -23,6 +24,7 @@ client.on("messageCreate", (message) => {
   }
   let msg = message.content; //ユーザが送信したメッセージはmessage.contentで取得可能
   message.channel.send(msg); //メッセージが送られたチャンネルに返信
+  mainApp.scraping();
 });
 // client.on('message', async message => {
 //   if (message.content === '!prompt') {
