@@ -22,9 +22,12 @@ client.on("messageCreate", (message) => {
   if (message.author.bot) { //botからのmessageを無視
     return;
   }
+  if (message.content === '!test') {
+    mainApp.runEveryDay();
+    return;
+  }
   let msg = message.content; //ユーザが送信したメッセージはmessage.contentで取得可能
   message.channel.send(msg); //メッセージが送られたチャンネルに返信
-  mainApp.scraping();
 });
 // client.on('message', async message => {
 //   if (message.content === '!prompt') {
