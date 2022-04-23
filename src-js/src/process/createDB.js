@@ -38,7 +38,7 @@ const clanID = process.env.CLAN_ID;
             con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${wtlist['info']}`),
             // アクティブ情報
             con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${wtlist['activity']}`),
-            // WT基本情報
+            // wotb基本情報
             con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`)
         ]);
         // const [rows, fields] = await con.query("select * from members");
