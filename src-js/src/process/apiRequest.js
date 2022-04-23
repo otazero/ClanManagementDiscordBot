@@ -1,6 +1,6 @@
 const request = require('request');
 
-async function apiRequest(clanID, option){
+async function wotbApiRequest(clanID, option){
     const wotbJson = await requestPromise(option);
     const memberDic = wotbJson['data'][`${clanID}`]['members'];
     let memberList = [];
@@ -26,11 +26,16 @@ async function apiRequest(clanID, option){
     return memberList;
 }
 
+async function discordApiRequest(option){
+    const discordJson = await requestPromise(option);
+    return discordJson;
+}
+
 function requestPromise(param){
     return new Promise((resolve, reject)=>{
         request(param, function (error, response, body) {
             if(error){
-                reject("WG鯖落ち説(定期)");
+                reject("鯖落ち説(定期)");
             }else{
                 resolve(body);
             }
@@ -49,5 +54,6 @@ function timestampToTime(t){
 
 
 module.exports = {
-    apiRequest
+    wotbApiRequest,
+    discordApiRequest
 };
