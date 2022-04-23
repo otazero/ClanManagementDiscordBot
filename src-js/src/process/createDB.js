@@ -1,5 +1,6 @@
 const mysql = require("mysql2/promise");
 const scrape = require('./scrape');
+const apiRequest = require('./apiRequest');
 require('dotenv').config();
 
 // メンバー一覧表示サイトURL
@@ -13,6 +14,15 @@ const db_setting = {
     database: 'clandb',
 };
 
+// APIオプション
+const api_options_1 = {
+    url: process.env.WG_API_1,
+    method: 'POST',
+    json: true
+}
+
+const clanID = process.env.CLAN_ID;
+
 (async () => {
 
     try {
@@ -21,13 +31,15 @@ const db_setting = {
         
         // スクレイピングとDBのテーブル作成を並列実行(理想)
         // hairetu = [ スクレイピングのreturn, なし];
-        const hairetu = await Promise.all([scraping(), buildDB(con)]);
+        const [wtlist, wotbList, unknown] = await Promise.all([scraping(), wotbApi(clanID, api_options_1),buildDB(con)]);
         // スクレイピングのデータをDBに一括登録
         await Promise.all([
-            // 基本情報
-            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${hairetu[0]['info']}`),
+            // WT基本情報
+            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${wtlist['info']}`),
             // アクティブ情報
-            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${hairetu[0]['activity']}`)
+            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${wtlist['activity']}`),
+            // WT基本情報
+            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`)
         ]);
         // const [rows, fields] = await con.query("select * from members");
         // for (const row of rows) {
@@ -57,6 +69,20 @@ async function scraping(){
         }
     }
     return {info:valuesInfo, activity:valuesActive};
+}
+
+// wotbメンバーDB登録
+async function wotbApi(id, option){
+    const memberList = await apiRequest.apiRequest(id, option);
+    const listLength = memberList.length;
+    let memberInfo = '';
+    for(let i = 0; i < listLength; i++){
+        memberInfo += `(${memberList[i].id},'${memberList[i].player}',${memberList[i].roleid},'${memberList[i].dateOfEntry}')`;
+        if(i !== listLength - 1){
+            memberInfo += ',';
+        }
+    }
+    return memberInfo;
 }
 
 // DBのテーブル作成
