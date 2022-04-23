@@ -1,10 +1,12 @@
 const mysql = require("mysql2/promise");
+const request = require('request');
 const scrape = require('./scrape');
 const  nowDateTime = require("./nowDateTime");
 require('dotenv').config();
 
 // メンバー一覧表示サイトURL
 const clanInfoURL = process.env.CLAN_SITE;
+
 
 // DBのログインに必要な情報
 const db_setting = {
@@ -13,6 +15,15 @@ const db_setting = {
     password: process.env.MYSQL_PASSWORD,
     database: 'clandb',
 };
+
+// APIオプション
+const api_options_1 = {
+    url: process.env.WG_API_1,
+    method: 'POST',
+    json: true
+}
+
+const clanID = process.env.CLAN_ID;
 
 async function runEveryDay(){
     // TODO:スクレイピングの実行
@@ -40,14 +51,25 @@ async function runEveryDay(){
             await con.query(`UPDATE t_wt_members SET t_is_flag = 0 , t_left_at = '${now.getDate()}' WHERE t_ign = '${row.t_ign}'`);
         }
     }
+    
+    
     await con.end();
 };
+
+async function test(){
+    const wotbJson = await requestPromise(api_options_1);
+    const memberDic = wotbJson['data'][`${clanID}`]['members'];
+    for(let key in memberDic){
+        console.log(memberDic[key]);
+    }
+}
 
 // スクレイピング 
 async function scraping(){
     const list = await scrape.fetch(clanInfoURL);
     return list;
 };
+
 
 
 /*
@@ -57,5 +79,6 @@ console.log(now.getMonth());
 console.log(now.getDate());
 */
 module.exports = {
-    runEveryDay
+    runEveryDay,
+    test
 };
