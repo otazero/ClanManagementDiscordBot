@@ -1,6 +1,8 @@
 const mysql = require("mysql2/promise");
 const scrape = require('./scrape');
 const apiRequest = require('./apiRequest');
+const otherModule = require('./otherModule');
+const  nowDateTime = require("./makeDateTime");
 require('dotenv').config();
 
 // メンバー一覧表示サイトURL
@@ -43,7 +45,7 @@ const clanID = process.env.CLAN_ID;
         
         // スクレイピングとDBのテーブル作成を並列実行(理想)
         // hairetu = [ スクレイピングのreturn, なし];
-        const [wtlist, wotbList, unknown] = await Promise.all([scraping(), wotbApi(clanID, api_options_1),buildDB(con)]);
+        const [wtlist, wotbList, discordList,unknown] = await Promise.all([scraping(), wotbApi(clanID, api_options_1),discordApi(api_options_2),buildDB(con)]);
         // スクレイピングのデータをDBに一括登録
         await Promise.all([
             // WT基本情報
@@ -51,8 +53,11 @@ const clanID = process.env.CLAN_ID;
             // アクティブ情報
             con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${wtlist['activity']}`),
             // wotb基本情報
-            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`)
+            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`),
+            // discord基本情報
+            con.query(`INSERT INTO d_discord_members(d_user_id, d_name, r_id, d_nick, d_ign, d_enter_at)VALUES ${discordList}`)
         ]);
+
         // const [rows, fields] = await con.query("select * from members");
         // for (const row of rows) {
         //     console.log(`id=${row.id}, name=${row.name}`);
@@ -97,18 +102,37 @@ async function wotbApi(id, option){
     return memberInfo;
 }
 
-// DiscordメンバーのDB登録用意
+// DiscordメンバーのDB登録用意(紐づけなし)
 async function discordApi(option){
     const memberList = await apiRequest.discordApiRequest(option);
+    let memberInfo = '';
     for(let row of memberList){
         if ('bot' in row['user']) {
             if(row['user']['bot']){
-                console.log(row['user']['username']);
                 continue;
             }
         }
-
+        let roleid = 6;
+        if(row.roles.includes('558947013744525313')){
+            // クラメン
+            roleid = 3;
+        }else if(row.roles.includes('483571690429743115')){
+            // 元老
+            roleid = 4;
+        }else if(row.roles.includes('746985465269452820')){
+            // ゲスト
+            roleid = 5;
+        }else if(row.roles.includes('483571692774621194')){
+            // 副司令
+            roleid = 2;
+        }else if(row.roles.includes('491578007392092170')){
+            // クラマス
+            roleid = 1;
+        }
+        const entered = new nowDateTime(new Date(Date.parse(row.joined_at)));
+        memberInfo += `(${row.user.id},'${row.user.username}',${roleid},'${row.nick}','${otherModule.ignMaker(row.user.username, row.nick)}','${entered.getDateTime()}'),`
     }
+    return memberInfo.slice(0,-1);
 }
 
 // DBのテーブル作成
