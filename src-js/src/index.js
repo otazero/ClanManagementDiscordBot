@@ -26,6 +26,10 @@ client.on("messageCreate", (message) => {
     mainApp.runEveryDay();
     return;
   }
+  if (message.content === 'hihi') {
+    mainApp.test();
+    return;
+  }
   let msg = message.content; //ユーザが送信したメッセージはmessage.contentで取得可能
   message.channel.send(msg); //メッセージが送られたチャンネルに返信
 });
