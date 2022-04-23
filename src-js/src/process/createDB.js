@@ -14,11 +14,23 @@ const db_setting = {
     database: 'clandb',
 };
 
-// APIオプション
+// wotb API オプション
 const api_options_1 = {
     url: process.env.WG_API_1,
     method: 'POST',
     json: true
+}
+// DIscordAPIオプション
+//ヘッダーを定義
+const headers = {
+    "Authorization": `Bot ${process.env.BOT_TOKEN}`
+}
+
+const api_options_2 ={
+    url: process.env.DISCORD_API_MEMBERS,
+    method: 'GET',
+    headers: headers,
+    json: true,
 }
 
 const clanID = process.env.CLAN_ID;
@@ -71,9 +83,9 @@ async function scraping(){
     return {info:valuesInfo, activity:valuesActive};
 }
 
-// wotbメンバーDB登録
+// wotbメンバーDB登録用意
 async function wotbApi(id, option){
-    const memberList = await apiRequest.apiRequest(id, option);
+    const memberList = await apiRequest.wotbApiRequest(id, option);
     const listLength = memberList.length;
     let memberInfo = '';
     for(let i = 0; i < listLength; i++){
@@ -83,6 +95,20 @@ async function wotbApi(id, option){
         }
     }
     return memberInfo;
+}
+
+// DiscordメンバーのDB登録用意
+async function discordApi(option){
+    const memberList = await apiRequest.discordApiRequest(option);
+    for(let row of memberList){
+        if ('bot' in row['user']) {
+            if(row['user']['bot']){
+                console.log(row['user']['username']);
+                continue;
+            }
+        }
+
+    }
 }
 
 // DBのテーブル作成
@@ -146,8 +172,8 @@ async function buildDB(con){
                 r_id TINYINT UNSIGNED NOT NULL,
                 d_nick VARCHAR(32),
                 d_ign VARCHAR(32) NOT NULL,
-                d_enter_at DATE NOT NULL,
-                d_left_at DATE,
+                d_enter_at DATETIME NOT NULL,
+                d_left_at DATETIME,
                 d_is_flag BOOLEAN DEFAULT true NOT NULL,
                 d_sub_id BIGINT UNIQUE,
                 
