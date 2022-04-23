@@ -1,7 +1,7 @@
 const mysql = require("mysql2/promise");
 const request = require('request');
 const scrape = require('./scrape');
-const  nowDateTime = require("./nowDateTime");
+const  nowDateTime = require("./makeDateTime");
 require('dotenv').config();
 
 // メンバー一覧表示サイトURL
