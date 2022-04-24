@@ -29,6 +29,18 @@ async function doubleIdFromIgnSelecter(playerName, roles, dbcon){
     return [wotbid, wtid];
 }
 
+/* WotbRole翻訳 */
+function wotbroleToDiscordrole(role){
+    switch(role){
+        case "private":
+            return 3;
+        case "executive_officer":
+            return 2;
+        case "commander":
+            return 1;
+    }
+}
+
 function pickupPlayerName(name){
     // 「かっこ」があるか
     const opk = name.lastIndexOf('(');
@@ -42,5 +54,6 @@ function pickupPlayerName(name){
 }
 module.exports = {
     ignMaker,
-    doubleIdFromIgnSelecter
+    doubleIdFromIgnSelecter,
+    wotbroleToDiscordrole
 };
