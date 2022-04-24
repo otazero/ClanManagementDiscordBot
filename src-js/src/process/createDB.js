@@ -49,9 +49,9 @@ const clanID = process.env.CLAN_ID;
         // スクレイピングのデータをDBに一括登録
         await Promise.all([
             // WT基本情報
-            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${wtlist['info']}`),
+            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${wtlist['info']}, ("My_TNTN_is_Long", 3, "2020-09-11", 0), ("BANANA_in_AWABI", 3, "2022-03-21", 0), ("IkuIkuKiyoshi", 3, "2020-08-12", 0)`),
             // wotb基本情報
-            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`)
+            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList},(114514, "NiggerGamer", 3, "2020-10-10 00:18:16"),(565656, "Doitsu_is_OP", 3, "2022-04-10 00:18:16"),(1919810, "SENHO", 3, "2020-10-15 00:19:16")`)
         ]);
         const [discordList, unknown2] = await Promise.all([
             await discordApi(api_options_2, con),
@@ -89,7 +89,7 @@ async function scraping(){
 
 // wotbメンバーDB登録用意
 async function wotbApi(id, option){
-    const memberList = await apiRequest.wotbApiRequest(id, option);
+    const memberList = await apiRequest.wotbApiRequest1(id, option);
     let memberInfo = '';
     for(row of memberList){
         memberInfo += `(${row.id},'${row.player}',${row.roleid},'${row.dateOfEntry}'),`;
