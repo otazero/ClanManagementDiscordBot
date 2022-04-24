@@ -1,7 +1,7 @@
 require('dotenv').config();
 let mainApp = require('./process/main');
 
-const { Client } = require('discord.js');
+const { Client , Intents, MessageEmbed} = require('discord.js');
 const token = process.env.BOT_TOKEN;
 const client = new Client({
   intents: ["GUILDS", "GUILD_MESSAGES"],
@@ -23,11 +23,245 @@ client.on("messageCreate", (message) => {
     return;
   }
   if (message.content === '!test') {
-    mainApp.runEveryDay();
+    mainApp.runEveryDay().then(([mesConttents]) => {
+      mesConttents.joinWt = mesConttents.joinWt.substring(0, 700);
+      // inWT inWotb outWT out Wotb
+      if(mesConttents.mesFlag.inWt){
+        if(mesConttents.mesFlag.inWotb){
+          if(mesConttents.mesFlag.outWt){
+            if(mesConttents.mesFlag.outWotb){
+              // 1 1 1 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 1 1 1 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }else{
+            if(mesConttents.mesFlag.outWotb){
+              // 1 1 0 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 1 1 0 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }
+        }else{
+          if(mesConttents.mesFlag.outWt){
+            if(mesConttents.mesFlag.outWotb){
+              // 1 0 1 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 1 0 1 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }else{
+            if(mesConttents.mesFlag.outWotb){
+              // 1 0 0 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 1 0 0 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }
+        }
+      }else{
+        if(mesConttents.mesFlag.inWotb){
+          if(mesConttents.mesFlag.outWt){
+            if(mesConttents.mesFlag.outWotb){
+              // 0 1 1 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 0 1 1 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }else{
+            if(mesConttents.mesFlag.outWotb){
+              // 0 1 0 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 0 1 0 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🌸ご入隊おめでとうございます🌸`, `本日${mesConttents.mesFlag.inWotb+mesConttents.mesFlag.inWt}名の方が当クランに参加してくださいました！\nよろしくね～♪`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.joinWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.joinWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }
+        }else{
+          if(mesConttents.mesFlag.outWt){
+            if(mesConttents.mesFlag.outWotb){
+              // 0 0 1 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 0 0 1 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }else{
+            if(mesConttents.mesFlag.outWotb){
+              // 0 0 0 1
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！定時報告です！')
+                .addField(`🎉お疲れさまでした🎉`, `本日${mesConttents.mesFlag.outWotb+mesConttents.mesFlag.outWt}名の方が当クランを脱退しました。\n今までありがとうございました。`)
+                .addField(`<:WT:747482544714547231>WarThunder部門`, `${mesConttents.leftWt}`, true)
+                .addField(`<:Blitz:755234073957367938>World of Tanks Blitz部門`, `${mesConttents.leftWotb}`, true)
+                .setColor('#800080')
+                .setTimestamp();
+              client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }else{
+              // 0 0 0 0
+              const embed = new MessageEmbed()
+                .setTitle('定時報告')
+                .setDescription('本日も一日お疲れさまでした！また明日もがんばろー💪')
+                .setColor('#800080')
+                .setTimestamp();
+                client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+            }
+          }
+        }
+      }
+    });
     return;
   }
   if (message.content === 'hihi') {
-    mainApp.test();
+    mainApp.test().then((val) => {
+      console.log(val);
+    });
     return;
   }
   let msg = message.content; //ユーザが送信したメッセージはmessage.contentで取得可能
