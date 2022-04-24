@@ -19,7 +19,7 @@ const db_setting = {
 // wotb API オプション
 const api_options_1 = {
     url: process.env.WG_API_1,
-    method: 'POST',
+    method: 'GET',
     json: true
 }
 // DIscordAPIオプション
@@ -45,23 +45,22 @@ const clanID = process.env.CLAN_ID;
         
         // スクレイピングとDBのテーブル作成を並列実行(理想)
         // hairetu = [ スクレイピングのreturn, なし];
-        const [wtlist, wotbList, discordList,unknown] = await Promise.all([scraping(), wotbApi(clanID, api_options_1),discordApi(api_options_2),buildDB(con)]);
+        const [wtlist, wotbList, unknown1] = await Promise.all([scraping(), wotbApi(clanID, api_options_1),buildDB(con)]);
         // スクレイピングのデータをDBに一括登録
         await Promise.all([
             // WT基本情報
             con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${wtlist['info']}`),
-            // アクティブ情報
-            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${wtlist['activity']}`),
             // wotb基本情報
-            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`),
-            // discord基本情報
-            con.query(`INSERT INTO d_discord_members(d_user_id, d_name, r_id, d_nick, d_ign, d_enter_at)VALUES ${discordList}`)
+            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList}`)
         ]);
+        const [discordList, unknown2] = await Promise.all([
+            await discordApi(api_options_2, con),
+            // アクティブ情報
+            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${wtlist['activity']}`)
+        ]);
+        // discord基本情報
+        await con.query(`INSERT INTO d_discord_members(d_user_id, d_name, w_user_id, t_user_id, r_id, d_nick, d_ign, d_enter_at)VALUES ${discordList}`)
 
-        // const [rows, fields] = await con.query("select * from members");
-        // for (const row of rows) {
-        //     console.log(`id=${row.id}, name=${row.name}`);
-        // }
         await con.end();
     } catch (e) {
         console.log(e);
@@ -103,7 +102,7 @@ async function wotbApi(id, option){
 }
 
 // DiscordメンバーのDB登録用意(紐づけなし)
-async function discordApi(option){
+async function discordApi(option, con){
     const memberList = await apiRequest.discordApiRequest(option);
     let memberInfo = '';
     for(let row of memberList){
@@ -130,7 +129,9 @@ async function discordApi(option){
             roleid = 1;
         }
         const entered = new nowDateTime(new Date(Date.parse(row.joined_at)));
-        memberInfo += `(${row.user.id},'${row.user.username}',${roleid},'${row.nick}','${otherModule.ignMaker(row.user.username, row.nick)}','${entered.getDateTime()}'),`
+        const ign = otherModule.ignMaker(row.user.username, row.nick);
+        const [wotbid, wtid] = await otherModule.doubleIdFromIgnSelecter(ign, row.roles, con);
+        memberInfo += `(${row.user.id},'${row.user.username}',${wotbid},${wtid},${roleid},'${row.nick}','${ign}','${entered.getDateTime()}'),`
     }
     return memberInfo.slice(0,-1);
 }
