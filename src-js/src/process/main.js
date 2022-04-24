@@ -30,18 +30,33 @@ async function runEveryDay(){
     const con = await mysql.createConnection(db_setting);
     
     const [WtDic, WotbDic] = await Promise.all([runEveryDayScrape(con), runEveryDayWotbApi(clanID, api_options_1, con)]);
-    console.log(WotbDic);
-    console.log(WtDic);
+    // console.log(WotbDic);
+    // console.log(WtDic);
+    const WtLefter = makeManyInfos(WtDic.lefter, 1, con);
+    const WotbLefter = makeManyInfos(WotbDic.lefter, 2, con);
     
     await con.end();
+    const mesCoonttents = {
+        joinWt:makeStrMemberList(WtDic.enter), 
+        joinWotb:makeStrMemberList(WotbDic.enter), 
+        leftWt:makeStrMemberList(WtDic.lefter), 
+        leftWotb:makeStrMemberList(WotbDic.lefter),
+        mesFlag:{
+            inWt:WtDic.enter.length,
+            inWotb:WotbDic.enter.length,
+            outWt:WtDic.lefter.length,
+            outWotb:WotbDic.lefter.length
+        }
+    };
+    return [mesCoonttents];
 };
 
 async function test(){
-    const con = await mysql.createConnection(db_setting);
+    // const con = await mysql.createConnection(db_setting);
     
-    await runEveryDayWotbApi(clanID, api_options_1, con);
+    return await runEveryDay();
 
-    await con.end();
+    // await con.end();
 }
 
 async function  runEveryDayScrape(con){
@@ -135,6 +150,38 @@ function timestampToTime(t){
             year: 'numeric', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
         });
+}
+
+function makeStrMemberList(arry){
+    if(!arry.length){
+        return '該当者なし\n';
+    }
+    let str = '>>>\n';
+    for(row of arry){
+        str += '・' + row.ign + '\n';
+    }
+    return str;
+}
+
+async function makeManyInfos(arry, gameName, con){
+    if(gameName===1){
+        let key = "t";
+    }else{
+        let key = "w";
+    }
+    const arryLength = arry.length;
+    if(!arryLength){
+        return '該当者なし\n';
+    }
+    let str = '>>>\n';
+    let discordIds = [];
+    for(row of arry){
+        str += '・' + row.ign + '\n';
+        const [discordMemInfo, field] = await con.query(`SELECT d_user_id FROM d_discord_members WHERE ${key}_user_id = ${row.id} LIMIT 1`);
+        discordIds.push(discordMemInfo[0].d_user_id);
+    }
+
+    return {sum:arryLength, memStrList:str, discordIds:discordIds};
 }
 
 /*
