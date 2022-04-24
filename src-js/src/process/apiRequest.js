@@ -1,6 +1,7 @@
+const otherModule = require('./otherModule');
 const request = require('request');
 
-async function wotbApiRequest(clanID, option){
+async function wotbApiRequest1(clanID, option){
     const wotbJson = await requestPromise(option);
     const memberDic = wotbJson['data'][`${clanID}`]['members'];
     let memberList = [];
@@ -10,20 +11,16 @@ async function wotbApiRequest(clanID, option){
         memberList[i].id = memberDic[key]["account_id"];
         memberList[i].player = memberDic[key]["account_name"];
         memberList[i].dateOfEntry = timestampToTime(memberDic[key]["joined_at"]).replace(/\//g, '-');
-        switch(memberDic[key]["role"]){
-            case "private":
-                memberList[i].roleid = 3;
-                break;
-            case "executive_officer":
-                memberList[i].roleid = 2;
-                break;
-            case "commander":
-                memberList[i].roleid = 1;
-                break;
-        }
+        memberList[i].roleid = otherModule.wotbroleToDiscordrole(memberDic[key]["role"]);
+        
         i++;
     }
     return memberList;
+}
+
+async function wotbApiRequest2(option){
+    const wotbJson = await requestPromise(option);
+    return wotbJson;
 }
 
 async function discordApiRequest(option){
@@ -53,7 +50,10 @@ function timestampToTime(t){
 
 
 
+
+
 module.exports = {
-    wotbApiRequest,
+    wotbApiRequest1,
+    wotbApiRequest2,
     discordApiRequest
 };
