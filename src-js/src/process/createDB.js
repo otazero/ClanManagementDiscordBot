@@ -90,15 +90,11 @@ async function scraping(){
 // wotbメンバーDB登録用意
 async function wotbApi(id, option){
     const memberList = await apiRequest.wotbApiRequest(id, option);
-    const listLength = memberList.length;
     let memberInfo = '';
-    for(let i = 0; i < listLength; i++){
-        memberInfo += `(${memberList[i].id},'${memberList[i].player}',${memberList[i].roleid},'${memberList[i].dateOfEntry}')`;
-        if(i !== listLength - 1){
-            memberInfo += ',';
-        }
+    for(row of memberList){
+        memberInfo += `(${row.id},'${row.player}',${row.roleid},'${row.dateOfEntry}'),`;
     }
-    return memberInfo;
+    return memberInfo.slice(0,-1);
 }
 
 // DiscordメンバーのDB登録用意(紐づけなし)
