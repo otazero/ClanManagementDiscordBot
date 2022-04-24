@@ -1,3 +1,4 @@
+/* Discordの名前からIGNを推測 */
 function ignMaker(userName, nickName){
     // ニックネームとユーザーネームどちらに記載してるか
     if(!nickName){
@@ -7,8 +8,25 @@ function ignMaker(userName, nickName){
         return pickupPlayerName(nickName);
     }
 }
-function ignSelect(playerName, dbcon){
-
+/* IGNからgameIDを求める */
+async function doubleIdFromIgnSelecter(playerName, roles, dbcon){
+    let wotbid = null;
+    let wtid = null; 
+    // WTロールがあれば
+    if(roles.includes('746933519518924910')){
+        const [resultWtID, field] = await dbcon.query(`SELECT t_user_id FROM t_wt_members WHERE t_ign = '${playerName}' LIMIT 1`);
+        if(resultWtID.length){
+            wtid = resultWtID[0].t_user_id;
+        }
+    }
+    // wotbロールがあれば
+    if(roles.includes('755088093702258819')){
+        const [resultWotbID, field] = await dbcon.query(`SELECT w_user_id FROM w_wotb_members WHERE w_ign = '${playerName}' LIMIT 1`);
+        if(resultWotbID.length){
+            wotbid = resultWotbID[0].w_user_id;
+        }
+    }
+    return [wotbid, wtid];
 }
 
 function pickupPlayerName(name){
@@ -24,5 +42,5 @@ function pickupPlayerName(name){
 }
 module.exports = {
     ignMaker,
-    ignSelect
+    doubleIdFromIgnSelecter
 };
