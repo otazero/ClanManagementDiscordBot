@@ -66,6 +66,12 @@ async function  runEveryDayScrape(con){
     if(insertFlag){
         await con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at)VALUES ${insertStr.slice(0,-1)}`);
     }
+    for(value of helloWt){
+        if(value.id==null){
+            const [pk, field] =  await con.query(`SELECT t_user_id FROM t_wt_members WHERE t_ign = '${value.ign}' LIMIT 1`);
+            value.id = pk[0].t_user_id;
+        }
+    }
     // TODO:wt_membersがスクレイピングにいなければ, wt_membersの在籍フラグを変更・退室日を記録
     const [rows, fields] = await con.query(`SELECT t_user_id, t_ign, t_enter_at, t_is_flag FROM t_wt_members`);
     let byebyeWt = [];
