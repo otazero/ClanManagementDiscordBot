@@ -156,7 +156,7 @@ function makeStrMemberList(arry){
     if(!arry.length){
         return '該当者なし\n';
     }
-    let str = '>>>\n';
+    let str = '>>> ';
     for(row of arry){
         str += '・' + row.ign + '\n';
     }
@@ -173,7 +173,7 @@ async function makeManyInfos(arry, gameName, con){
     if(!arryLength){
         return '該当者なし\n';
     }
-    let str = '>>>\n';
+    let str = '>>> ';
     let discordIds = [];
     for(row of arry){
         str += '・' + row.ign + '\n';
