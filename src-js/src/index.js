@@ -8,8 +8,16 @@ const client = new Client({
   intents: ["GUILDS", "GUILD_MESSAGES"],
 });
 'use strict';
+
+const guild_id = process.env.GUILD_ID;
+
 client.once('ready', () => {
   console.log('接続しました！');
+  client.guilds.cache.get(`${guild_id}`).members.fetch(`${アカウントID}`).then((mesConttents) => {
+    console.log(mesConttents.constructor.name);
+    mesConttents.roles.add(`${ロールID}`);
+  });
+  //.roles.add('558947013744525313')
 });
 
 // 毎分
