@@ -5,30 +5,40 @@ const cron = require('node-cron');
 const { Client , Intents, MessageEmbed} = require('discord.js');
 const token = process.env.BOT_TOKEN;
 const client = new Client({
-  intents: ["GUILDS", "GUILD_MESSAGES"],
+  // intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MEMBERS"],
+  intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_WEBHOOKS", "GUILD_PRESENCES", "GUILD_MESSAGES"]
 });
 'use strict';
 
 const guild_id = process.env.GUILD_ID;
 
-client.once('ready', () => {
+/*client.once('ready', () => {
   console.log('接続しました！');
   client.guilds.cache.get(`${guild_id}`).members.fetch(`${アカウントID}`).then((mesConttents) => {
     console.log(mesConttents.constructor.name);
     mesConttents.roles.add(`${ロールID}`);
   });
   //.roles.add('558947013744525313')
-});
+});*/
 
 // 毎分
 // '* * * * *'
 client.on('ready', () => {
+  console.log('接続しました！');
   cron.schedule('* * * * *', () => {
     client.channels.cache.get('967753820052533248').send("テスト!");
   },{
     scheduled: true,
     timezone: "Asia/Tokyo"
   });
+});
+
+client.on('guildMemberUpdate', (oldMembers, newMembers) => {
+  console.log("変更前");
+  console.log(oldMembers.roles.cache.map(role => role.id));
+  console.log("変更後");
+  console.log(newMembers.roles.cache.map(role => role.id));
+  console.log("\n\n\n");
 });
 
 // client.on('message', (message) => {
@@ -38,13 +48,13 @@ client.on('ready', () => {
 //   }
 // });
 /* 入室 */
-client.on('guildMemberAdd', member => {
-  console.log(`${member.guild.name} に ${member.displayName} が参加しました`)
-})
+client.on('guildMemberAdd', (member) => {
+  console.log(`${member.guild.name} に ${member.displayName} が参加しました`);
+});
 /* 退室 */
-client.on('guildMemberRemove', member => {
-  console.log(`${member.guild.name} から ${member.displayName} が退出しました`)
-})
+client.on('guildMemberRemove', (member) => {
+  console.log(`${member.guild.name} から ${member.displayName} が退出しました`);
+});
 
 client.on("messageCreate", (message) => {
   if (message.author.bot) { //botからのmessageを無視
@@ -308,4 +318,4 @@ client.on("messageCreate", (message) => {
 // })
 
 client.login(token)
-  .catch(console.error)
+  .catch(console.error);
