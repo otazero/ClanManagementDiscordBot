@@ -1,14 +1,26 @@
 require('dotenv').config();
-let mainApp = require('./process/main');
+const mainApp = require('./process/main');
+const cron = require('node-cron');
 
 const { Client , Intents, MessageEmbed} = require('discord.js');
 const token = process.env.BOT_TOKEN;
 const client = new Client({
   intents: ["GUILDS", "GUILD_MESSAGES"],
 });
-
+'use strict';
 client.once('ready', () => {
   console.log('接続しました！');
+});
+
+// 毎分
+// '* * * * *'
+client.on('ready', () => {
+  cron.schedule('* * * * *', () => {
+    client.channels.cache.get('967753820052533248').send("テスト!");
+  },{
+    scheduled: true,
+    timezone: "Asia/Tokyo"
+  });
 });
 
 // client.on('message', (message) => {
@@ -17,6 +29,14 @@ client.once('ready', () => {
 //     message.reply('こんにちは！').catch(console.error);
 //   }
 // });
+/* 入室 */
+client.on('guildMemberAdd', member => {
+  console.log(`${member.guild.name} に ${member.displayName} が参加しました`)
+})
+/* 退室 */
+client.on('guildMemberRemove', member => {
+  console.log(`${member.guild.name} から ${member.displayName} が退出しました`)
+})
 
 client.on("messageCreate", (message) => {
   if (message.author.bot) { //botからのmessageを無視
