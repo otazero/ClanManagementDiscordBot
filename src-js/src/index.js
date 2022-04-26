@@ -6,7 +6,8 @@ const { Client , Intents, MessageEmbed} = require('discord.js');
 const token = process.env.BOT_TOKEN;
 const client = new Client({
   // intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MEMBERS"],
-  intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_WEBHOOKS", "GUILD_PRESENCES", "GUILD_MESSAGES"]
+  // intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_WEBHOOKS", "GUILD_PRESENCES", "GUILD_MESSAGES"]
+  intents: Object.values(Intents.FLAGS)
 });
 'use strict';
 
@@ -23,9 +24,11 @@ const guild_id = process.env.GUILD_ID;
 
 // 毎分
 // '* * * * *'
+// 毎分0秒に1分起きに実行
+// '0 */1 * * * *'
 client.on('ready', () => {
   console.log('接続しました！');
-  cron.schedule('* * * * *', () => {
+  cron.schedule('0 */1 * * * *', () => {
     client.channels.cache.get('967753820052533248').send("テスト!");
   },{
     scheduled: true,
