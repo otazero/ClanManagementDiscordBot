@@ -357,8 +357,6 @@ client.on("messageCreate", (message) => {
     });
     return;
   }
-  let msg = message.content; //ユーザが送信したメッセージはmessage.contentで取得可能
-  message.channel.send(msg); //メッセージが送られたチャンネルに返信
 });
 // client.on('message', async message => {
 //   if (message.content === '!prompt') {
