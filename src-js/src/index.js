@@ -2,7 +2,10 @@ require('dotenv').config();
 const mainApp = require('./process/main');
 const cron = require('node-cron');
 
-const { Client , Intents, MessageEmbed} = require('discord.js');
+const data = require('../data/data.json');
+const ngWords = data.date.ngWords;
+
+const { Client , Intents, MessageEmbed, Permissions} = require('discord.js');
 const token = process.env.BOT_TOKEN;
 const client = new Client({
   // intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MEMBERS"],
@@ -22,6 +25,8 @@ const guild_id = process.env.GUILD_ID;
   //.roles.add('558947013744525313')
 });*/
 
+const start = new Date();
+
 // 毎分
 // '* * * * *'
 // 毎分0秒に1分起きに実行
@@ -29,7 +34,9 @@ const guild_id = process.env.GUILD_ID;
 client.on('ready', () => {
   console.log('接続しました！');
   cron.schedule('0 */1 * * * *', () => {
-    client.channels.cache.get('967753820052533248').send("テスト!");
+    const now = new Date();
+    const pass = (now.getTime() - start.getTime()) / 1000 / 60;
+    client.channels.cache.get('967753820052533248').send(`起動後${Math.round(pass)}分経過`);
   },{
     scheduled: true,
     timezone: "Asia/Tokyo"
@@ -63,6 +70,51 @@ client.on("messageCreate", (message) => {
   if (message.author.bot) { //botからのmessageを無視
     return;
   }
+
+  /* NGワード検出 */
+  if(message.channel.parentId == '558946199760142337'){
+    for(word of ngWords){
+      if(message.content.includes(word)){
+        // const msg = `暴力的な言葉を検出しました:${word}\nはいBAN`;
+        // message.channel.send(msg);
+        message.member.roles.add('968726766208299068').then(
+          () => {
+            message.guild.channels.create('名誉取り消し申請所', { 
+              parent: "968729716607565875",
+              permissionOverwrites: [
+                {
+                  id: message.author.id,
+                  allow: [
+                    Permissions.FLAGS.VIEW_CHANNEL, 
+                    Permissions.FLAGS.SEND_MESSAGES,
+                    Permissions.FLAGS.EMBED_LINKS
+                  ],
+                },
+                {
+                  id: '428086533086642179',
+                  deny: [Permissions.FLAGS.VIEW_CHANNEL]
+                },
+                {
+                  id: '965547497307140106',
+                  allow: [
+                    Permissions.FLAGS.MANAGE_CHANNELS,
+                    Permissions.FLAGS.VIEW_CHANNEL, 
+                    Permissions.FLAGS.SEND_MESSAGES,
+                    Permissions.FLAGS.EMBED_LINKS,
+                    Permissions.FLAGS.ADD_REACTIONS
+                  ]
+                }
+              ]
+            }).then(channel => {
+              channel.send('MESSAGE HERE')
+            });
+          }
+        );
+        
+        return;
+      }
+    }
+  };
   if (message.content === '!test') {
     mainApp.runEveryDay().then(([mesConttents]) => {
       mesConttents.joinWt = mesConttents.joinWt.substring(0, 700);
