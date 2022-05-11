@@ -70,51 +70,6 @@ client.on("messageCreate", (message) => {
   if (message.author.bot) { //botからのmessageを無視
     return;
   }
-
-  /* NGワード検出 */
-  if(message.channel.parentId == '558946199760142337'){
-    for(word of ngWords){
-      if(message.content.includes(word)){
-        // const msg = `暴力的な言葉を検出しました:${word}\nはいBAN`;
-        // message.channel.send(msg);
-        message.member.roles.add('968726766208299068').then(
-          () => {
-            message.guild.channels.create('名誉取り消し申請所', { 
-              parent: "968729716607565875",
-              permissionOverwrites: [
-                {
-                  id: message.author.id,
-                  allow: [
-                    Permissions.FLAGS.VIEW_CHANNEL, 
-                    Permissions.FLAGS.SEND_MESSAGES,
-                    Permissions.FLAGS.EMBED_LINKS
-                  ],
-                },
-                {
-                  id: '428086533086642179',
-                  deny: [Permissions.FLAGS.VIEW_CHANNEL]
-                },
-                {
-                  id: '965547497307140106',
-                  allow: [
-                    Permissions.FLAGS.MANAGE_CHANNELS,
-                    Permissions.FLAGS.VIEW_CHANNEL, 
-                    Permissions.FLAGS.SEND_MESSAGES,
-                    Permissions.FLAGS.EMBED_LINKS,
-                    Permissions.FLAGS.ADD_REACTIONS
-                  ]
-                }
-              ]
-            }).then(channel => {
-              channel.send('MESSAGE HERE')
-            });
-          }
-        );
-        
-        return;
-      }
-    }
-  };
   if (message.content === '!test') {
     mainApp.runEveryDay().then(([mesConttents]) => {
       mesConttents.joinWt = mesConttents.joinWt.substring(0, 700);
