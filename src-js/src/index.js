@@ -43,6 +43,7 @@ client.on('ready', () => {
   });
 });
 
+/*  ロール等に変更があった場合  */
 client.on('guildMemberUpdate', (oldMembers, newMembers) => {
   console.log("変更前");
   console.log(oldMembers.roles.cache.map(role => role.id));
@@ -70,6 +71,7 @@ client.on("messageCreate", (message) => {
   if (message.author.bot) { //botからのmessageを無視
     return;
   }
+  /* 一日一回行うコード(入退室者の云々) */
   if (message.content === '!test') {
     mainApp.runEveryDay().then(([mesConttents]) => {
       mesConttents.joinWt = mesConttents.joinWt.substring(0, 700);
@@ -306,6 +308,7 @@ client.on("messageCreate", (message) => {
     });
     return;
   }
+  
   if (message.content === 'hihi') {
     mainApp.test().then((val) => {
       console.log(val);
