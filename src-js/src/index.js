@@ -15,15 +15,11 @@ const client = new Client({
 'use strict';
 
 const guild_id = process.env.GUILD_ID;
-
-/*client.once('ready', () => {
+// mesConttents
+client.once('ready', () => {
   console.log('接続しました！');
-  client.guilds.cache.get(`${guild_id}`).members.fetch(`${アカウントID}`).then((mesConttents) => {
-    console.log(mesConttents.constructor.name);
-    mesConttents.roles.add(`${ロールID}`);
-  });
   //.roles.add('558947013744525313')
-});*/
+});
 
 const start = new Date();
 
@@ -32,8 +28,8 @@ const start = new Date();
 // 毎分0秒に1分起きに実行
 // '0 */1 * * * *'
 client.on('ready', () => {
-  console.log('接続しました！');
   cron.schedule('0 */1 * * * *', () => {
+    // TODO: スクレイピング→入退室の確認など
     const now = new Date();
     const pass = (now.getTime() - start.getTime()) / 1000 / 60;
     client.channels.cache.get('967753820052533248').send(`起動後${Math.round(pass)}分経過`);
@@ -44,6 +40,19 @@ client.on('ready', () => {
 });
 
 /*  ロール等に変更があった場合  */
+// TODO:DiscordMembersのロールを変更
+/*
+  変更前
+[ '746933519518924910', '558947013744525313', '428086533086642179' ]
+変更後
+[
+  '746933519518924910',
+  '968726766208299068',
+  '558947013744525313',
+  '428086533086642179'
+]
+*/
+/*
 client.on('guildMemberUpdate', (oldMembers, newMembers) => {
   console.log("変更前");
   console.log(oldMembers.roles.cache.map(role => role.id));
@@ -51,6 +60,7 @@ client.on('guildMemberUpdate', (oldMembers, newMembers) => {
   console.log(newMembers.roles.cache.map(role => role.id));
   console.log("\n\n\n");
 });
+*/
 
 // client.on('message', (message) => {
 //   console.log('通過！');
@@ -72,8 +82,33 @@ client.on("messageCreate", (message) => {
     return;
   }
   /* 一日一回行うコード(入退室者の云々) */
-  if (message.content === '!test') {
-    mainApp.runEveryDay().then(([mesConttents]) => {
+  if (message.content === '!oneDay') {
+    mainApp.runEveryDay().then(([mesConttents, WtLefter, WotbLefter]) => {
+
+      // ロール移動
+      // クランメンバー→元老
+      const discordMemberInfo = client.guilds.cache.get(`${guild_id}`);
+      if(WtLefter.discordIds.length){
+        for(let discordid of WtLefter.discordIds){
+          discordMemberInfo.members.fetch(`${discordid}`).then((member) => {
+            // 元老ロール付与
+            member.roles.add(`483571690429743115`);
+            // クランメンバーロール剥奪
+            member.roles.remove(`558947013744525313`);
+          });
+        }
+      }
+      if(WotbLefter.discordIds.length){
+        for(let discordid of WotbLefter.discordIds){
+          discordMemberInfo.members.fetch(`${discordid}`).then((member) => {
+            // 元老ロール付与
+            member.roles.add(`483571690429743115`);
+            // クランメンバーロール剥奪
+            member.roles.remove(`558947013744525313`);
+          });
+        }
+      }
+      // 文字数制限
       mesConttents.joinWt = mesConttents.joinWt.substring(0, 700);
       // inWT inWotb outWT out Wotb
       if(mesConttents.mesFlag.inWt){
@@ -330,3 +365,6 @@ client.on("messageCreate", (message) => {
 
 client.login(token)
   .catch(console.error);
+
+  //クラス名
+  //.constructor.name

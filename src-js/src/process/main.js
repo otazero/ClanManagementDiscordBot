@@ -26,29 +26,35 @@ const api_options_1 = {
 
 const clanID = process.env.CLAN_ID;
 
+// 一日一回実行する処理(スクレイピング・DB登録など)
 async function runEveryDay(){
     const con = await mysql.createConnection(db_setting);
     
+    // スクレイピングとAPI問い合わせ実行
     const [WtDic, WotbDic] = await Promise.all([runEveryDayScrape(con), runEveryDayWotbApi(clanID, api_options_1, con)]);
     // console.log(WotbDic);
     // console.log(WtDic);
-    const WtLefter = makeManyInfos(WtDic.lefter, 1, con);
-    const WotbLefter = makeManyInfos(WotbDic.lefter, 2, con);
-    
+
+    // ユーザーID付き...maybe...
+    const WtLefter = await makeManyInfos(WtDic.lefter, 1, con);
+    const WotbLefter = await makeManyInfos(WotbDic.lefter, 2, con);
     await con.end();
     const mesCoonttents = {
         joinWt:makeStrMemberList(WtDic.enter), 
         joinWotb:makeStrMemberList(WotbDic.enter), 
-        leftWt:makeStrMemberList(WtDic.lefter), 
-        leftWotb:makeStrMemberList(WotbDic.lefter),
+        leftWt:WtLefter.memStrList, 
+        leftWotb:WotbLefter.memStrList,
+        // 該当項目の有無
         mesFlag:{
             inWt:WtDic.enter.length,
             inWotb:WotbDic.enter.length,
-            outWt:WtDic.lefter.length,
-            outWotb:WotbDic.lefter.length
+            outWt:WtLefter.sum,
+            outWotb:WotbLefter.sum
+            // outWt:WtDic.lefter.length,
+            // outWotb:WotbDic.lefter.length
         }
     };
-    return [mesCoonttents];
+    return [mesCoonttents, WtLefter, WotbLefter];
 };
 
 async function test(){
@@ -164,10 +170,11 @@ function makeStrMemberList(arry){
 }
 
 async function makeManyInfos(arry, gameName, con){
+    let key = "";
     if(gameName===1){
-        let key = "t";
+        key = "t";
     }else{
-        let key = "w";
+        key = "w";
     }
     const arryLength = arry.length;
     if(!arryLength){
@@ -177,7 +184,10 @@ async function makeManyInfos(arry, gameName, con){
     let discordIds = [];
     for(row of arry){
         str += '・' + row.ign + '\n';
-        const [discordMemInfo, field] = await con.query(`SELECT d_user_id FROM d_discord_members WHERE ${key}_user_id = ${row.id} LIMIT 1`);
+        const [discordMemInfo, field] = await con.query(`SELECT d_user_id FROM d_discord_members WHERE ${key}_user_id = ${row.id} AND r_id = 558947013744525313 LIMIT 1`);
+        if(!(discordMemInfo.length)){
+            continue;
+        }
         discordIds.push(discordMemInfo[0].d_user_id);
     }
 
