@@ -1,5 +1,8 @@
 const mysql = require("mysql2/promise");
 const scrape = require('./scrape');
+const apiRequest = require('./apiRequest');
+const otherModule = require('./otherModule');
+const  nowDateTime = require("./makeDateTime");
 require('dotenv').config();
 
 // メンバー一覧表示サイトURL
@@ -13,6 +16,27 @@ const db_setting = {
     database: 'clandb',
 };
 
+// wotb API オプション
+const api_options_1 = {
+    url: process.env.WG_API_1,
+    method: 'GET',
+    json: true
+}
+// DIscordAPIオプション
+//ヘッダーを定義
+const headers = {
+    "Authorization": `Bot ${process.env.BOT_TOKEN}`
+}
+
+const api_options_2 ={
+    url: process.env.DISCORD_API_MEMBERS,
+    method: 'GET',
+    headers: headers,
+    json: true,
+}
+
+const clanID = process.env.CLAN_ID;
+
 (async () => {
 
     try {
@@ -21,18 +45,22 @@ const db_setting = {
         
         // スクレイピングとDBのテーブル作成を並列実行(理想)
         // hairetu = [ スクレイピングのreturn, なし];
-        const hairetu = await Promise.all([scraping(), buildDB(con)]);
+        const [wtlist, wotbList, unknown1] = await Promise.all([scraping(), wotbApi(clanID, api_options_1),buildDB(con)]);
         // スクレイピングのデータをDBに一括登録
         await Promise.all([
-            // 基本情報
-            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${hairetu[0]['info']}`),
-            // アクティブ情報
-            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${hairetu[0]['activity']}`)
+            // WT基本情報
+            con.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_all_active)VALUES ${wtlist['info']}, ("My_TNTN_is_Long", 3, "2020-09-11", 0), ("BANANA_in_AWABI", 3, "2022-03-21", 0), ("IkuIkuKiyoshi", 3, "2020-08-12", 0)`),
+            // wotb基本情報
+            con.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at)VALUES ${wotbList},(114514, "NiggerGamer", 3, "2020-10-10 00:18:16"),(565656, "Doitsu_is_OP", 3, "2022-04-10 00:18:16"),(1919810, "SENHO", 3, "2020-10-15 00:19:16")`)
         ]);
-        // const [rows, fields] = await con.query("select * from members");
-        // for (const row of rows) {
-        //     console.log(`id=${row.id}, name=${row.name}`);
-        // }
+        const [discordList, unknown2] = await Promise.all([
+            await discordApi(api_options_2, con),
+            // アクティブ情報
+            con.query(`INSERT INTO wt_actives(t_user_id, wt_active)VALUES ${wtlist['activity']}`)
+        ]);
+        // discord基本情報
+        await con.query(`INSERT INTO d_discord_members(d_user_id, d_name, w_user_id, t_user_id, r_id, d_nick, d_ign, d_enter_at)VALUES ${discordList}`)
+
         await con.end();
     } catch (e) {
         console.log(e);
@@ -57,6 +85,51 @@ async function scraping(){
         }
     }
     return {info:valuesInfo, activity:valuesActive};
+}
+
+// wotbメンバーDB登録用意
+async function wotbApi(id, option){
+    const memberList = await apiRequest.wotbApiRequest1(id, option);
+    let memberInfo = '';
+    for(row of memberList){
+        memberInfo += `(${row.id},'${row.player}',${row.roleid},'${row.dateOfEntry}'),`;
+    }
+    return memberInfo.slice(0,-1);
+}
+
+// DiscordメンバーのDB登録用意(紐づけなし)
+async function discordApi(option, con){
+    const memberList = await apiRequest.discordApiRequest(option);
+    let memberInfo = '';
+    for(let row of memberList){
+        if ('bot' in row['user']) {
+            if(row['user']['bot']){
+                continue;
+            }
+        }
+        let roleid = 6;
+        if(row.roles.includes('558947013744525313')){
+            // クラメン
+            roleid = 3;
+        }else if(row.roles.includes('483571690429743115')){
+            // 元老
+            roleid = 4;
+        }else if(row.roles.includes('746985465269452820')){
+            // ゲスト
+            roleid = 5;
+        }else if(row.roles.includes('483571692774621194')){
+            // 副司令
+            roleid = 2;
+        }else if(row.roles.includes('491578007392092170')){
+            // クラマス
+            roleid = 1;
+        }
+        const entered = new nowDateTime(new Date(Date.parse(row.joined_at)));
+        const ign = otherModule.ignMaker(row.user.username, row.nick);
+        const [wotbid, wtid] = await otherModule.doubleIdFromIgnSelecter(ign, row.roles, con);
+        memberInfo += `(${row.user.id},'${row.user.username}',${wotbid},${wtid},${roleid},'${row.nick}','${ign}','${entered.getDateTime()}'),`
+    }
+    return memberInfo.slice(0,-1);
 }
 
 // DBのテーブル作成
@@ -120,8 +193,8 @@ async function buildDB(con){
                 r_id TINYINT UNSIGNED NOT NULL,
                 d_nick VARCHAR(32),
                 d_ign VARCHAR(32) NOT NULL,
-                d_enter_at DATE NOT NULL,
-                d_left_at DATE,
+                d_enter_at DATETIME NOT NULL,
+                d_left_at DATETIME,
                 d_is_flag BOOLEAN DEFAULT true NOT NULL,
                 d_sub_id BIGINT UNIQUE,
                 
