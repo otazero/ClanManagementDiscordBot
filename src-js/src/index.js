@@ -366,5 +366,5 @@ client.on("messageCreate", (message) => {
 client.login(token)
   .catch(console.error);
 
-  //クラス名
-  //.constructor.name
+//クラス名
+//.constructor.name
