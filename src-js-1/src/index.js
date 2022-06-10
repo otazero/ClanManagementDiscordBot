@@ -52,15 +52,35 @@ client.on('ready', () => {
   '428086533086642179'
 ]
 */
-/*
 client.on('guildMemberUpdate', (oldMembers, newMembers) => {
-  console.log("変更前");
-  console.log(oldMembers.roles.cache.map(role => role.id));
-  console.log("変更後");
-  console.log(newMembers.roles.cache.map(role => role.id));
-  console.log("\n\n\n");
+  // 変更前
+  const oldRoles = oldMembers.roles.cache.map(role => role.id);
+  // 変更後
+  const newRoles = newMembers.roles.cache.map(role => role.id);
+  let oldR = [];
+  let newR = [];
+  let temps = [];
+  for(let role of oldRoles){
+    if(newRoles.includes(role)){
+      temps.push(role);
+    }
+    else{
+      oldR.push(role);
+    }
+  }
+  for(let role of newRoles){
+    if(temps.includes(role)){
+      continue;
+    }
+    else{
+      newR.push(role);
+    }
+  }
+  // クラン→元老
+  if(oldR.includes('558947013744525313') &&  newR.includes('483571690429743115')){
+    //TODO: DB変更
+  }
 });
-*/
 
 // client.on('message', (message) => {
 //   console.log('通過！');

@@ -4,7 +4,7 @@ async function fetch(URL){
     // const baseUrl = process.env.CLAN_SITE;
     let pslist = [];
 
-    const result = await client.fetch(URL)
+    const result = await client.fetch(URL);
     const $ = result.$;
     $('span.__cf_email__').each(function(){
         let email = cfDecodeEmail($(this).attr('data-cfemail'));
