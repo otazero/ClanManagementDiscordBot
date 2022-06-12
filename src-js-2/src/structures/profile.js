@@ -1,48 +1,72 @@
+/* Userクラス */
+
+/**
+ * ユーザークラスの基本型
+ */
 class User {
     constructor() {
-        this.id;
-        this.ign;
-        this.role;
-        this.enter_at;
-        this.left_at;
-        this.isflag;
+        /** @type {?number}  ユーザーID*/
+        this.id = null;
+        /** @type {?String}  IGN*/
+        this.ign = null;
+        /** @type {?number}  ロールID*/
+        this.role = null;
+        /** @type {?String}  入室日*/
+        this.enter_at = null;
+        /** @type {?String}  退室日*/
+        this.left_at = null;
+        /** @type {Boolean}  在籍フラグ。Trueでいる。*/
+        this.isflag = true;
     }
 }
 
+/**
+ * WotBユーザークラス
+ * @extends User
+ */
 class WotbUser extends User {
     constructor(){
         super();
     }
 }
 
+
+/**
+ * WarThunderユーザークラス
+ * @extends User
+ */
 class ThunderUser extends User {
     constructor(){
         super();
-        this.nowactive;
-        this.allactive;
+        /** @type {number}  1ヶ月毎のアクティブ*/
+        this.nowactive = 0;
+        /** @type {number}  総アクティブ*/
+        this.allactive = 0;
     }
 }
 
+/**
+ * Discordユーザークラス
+ * @extends User
+ */
 class DiscordUser extends User {
     constructor(){
         super();
-        this.username;
-        this.wotbid;
-        this.thunderis;
-        this.nick;
-        this.sub;
+        /** @type {?String}  ユーザー名*/
+        this.username = null;
+        /** @type {?number}  wotbID*/
+        this.wotbid = null;
+        /** @type {?number}  WtID*/
+        this.thunderid = null;
+        /** @type {?String}  ニックネーム*/
+        this.nick = null;
+        /** @type {?number}  サブ垢ID*/
+        this.sub = null;
     }
 }
 
-let list = [1, 2, 3];
-let temp = [];
-for(let i of list){
-    let test = new DiscordUser(i);
-    temp.push(test);
+module.exports = {
+    WotbUser,
+    ThunderUser,
+    DiscordUser
 }
-
-console.log(temp);
-
-temp.forEach(i => {
-    console.log(i.username);
-});
