@@ -1,0 +1,6 @@
+# 設定キーファイル
+config.ini
+config.yaml
+
+# ライブラリ
+node_modules
