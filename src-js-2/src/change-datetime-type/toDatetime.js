@@ -7,19 +7,24 @@ function timestampToTime(t){
 }
 /**
  *　あらゆる時刻表記をDateTimeに変換する。
+ *  "2018-10-07T05:02:13.243000+00:00"
+ *  "タイムスタンプ(10 or 13桁)"
+ *  "11.02.2022"
+ *  "Date型"
+ *  引数なき場合は現在時刻
  */
 class shapDatetime{
+    
     /**
      * 
      * @param {number | string} dt 
      */
-    static toDatetime(dt = new Date()){
-        let datetime = '';
+    constructor(dt = new Date()){
         switch (typeof(dt)) {
             case 'string':
                 if((dt[2] === '.' && dt[5] === '.') && dt.length === 10){
                     console.log(`${dt}はイギリス式`);
-                    datetime = this.#britishStyle(dt);
+                    this.#britishStyle(dt);
                 }
                 else if(((((dt[4] === '-' && dt[7] === '-') && dt[10] === 'T') && dt[13] === ':') && dt[16]=== ':') && (dt.length === 32)){
                     console.log(`${dt}はISO`);
@@ -32,26 +37,28 @@ class shapDatetime{
                 const numstr = '' + dt;
                 if(numstr.length === 10){
                     console.log(`${dt}は10桁のtimestamp`);
+                    dt *= 1000;
                 }
                 else if (numstr.length === 13){
                     console.log(`${dt}は13桁のtimestamp`);
                 }
-
+                else{
+                    break;
+                }
+                this.#datetype(new Date(dt));
                 break;
             case 'object':
                 if(dt.constructor.name === 'Date'){
                     console.log(`${dt}はDate型`);
+                    this.#datetype(dt);
                 }
                 break;
             default:
                 console.log(`${dt}は...意味不明な型です`);
                 break;
-        }
-
-        return datetime;
-        
+        }        
     }
-    static #britishStyle(dt){
+    #britishStyle(dt){
         let date = {year:'', month:'', day:''};
         for(let i in dt){
             if(i < 2){
@@ -70,25 +77,22 @@ class shapDatetime{
                 date.year += dt[i];
             }
         }
-        const datetime = `${date.year}-${date.month}-${date.day}`;
-        return datetime;
+        this.year = Number(date.year);
+        this.month = Number(date.month);
+        this.day = Number(date.day);
     }
-    static #iso8061(dt){
+    #iso8061(dt){
+        const datepack = dt.split(/-|:|T|\+/);
+        const sec = Math.round(Number(datepack[5]));
+        this.year = datepack[0];
+        this.month = datepack[1];
+        this.day = datepack[2];
+        this.hour = datepack[3];
+        this.min = datepack[4];
+        this.sec = ''+((sec<10)?'0'+sec:''+sec);
 
     }
-
-}
-
-/* よく使う日付関係を返すclass */
-class changeDateTime{
-    //指定しなければ現在時刻
-    constructor(dt = new Date()){
-        // 日本の時間に修正
-        // dt.setTime(dt.getTime() /*+ 32400000*/); // 1000 * 60 * 60 * 9(hour)
-        console.log(dt.toLocaleDateString('ja', {
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-        }), "test");
+    #datetype(dt){
         // 日付を数字として取り出す
         let year  = dt.getFullYear();
         let month = dt.getMonth()+1;
@@ -119,35 +123,22 @@ class changeDateTime{
         this.min = min;
         this.sec = sec;
     }
-
+    /**
+     * @returns {string} 月
+     */
     get getMonth(){
         return this.month;
     }
-
+    /**
+     * @returns {string} 年-月-日
+     */
     get getDate(){
         return this.year + '-' + this.month + '-' +this.day;
     }
-
+    /**
+     * @returns {string} 年-月-日 時:分:秒
+     */
     get getDateTime(){
         return this.year + '-' + this.month + '-' +this.day + ' ' + this.hour + ':' + this.min + ':' + this.sec;
     }
 }
-/*
-const time = new changeDateTime();
-console.log(time.getDateTime);
-const dt = new Date(1527547761*1000);
-console.log(dt);
-console.log(timestampToTime(1527547761));
-*/
-/*
-const ggg = new Date();
-console.log(ggg.constructor.name + "test");
-*/
-const aaaaa = shapDatetime.toDatetime("19.11.2020");
-console.log(aaaaa);
-const bbbbb = shapDatetime.toDatetime("2021-02-09T18:42:22.900000+00:00");
-const ccccc = shapDatetime.toDatetime(1644683669);
-console.log(bbbbb + "aaa");
-/*
-const ddd = "19.11.2020";
-console.log(ddd.length);*/
