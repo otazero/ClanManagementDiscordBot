@@ -1,10 +1,3 @@
-function timestampToTime(t){
-    return new Date(t * 1000)
-        .toLocaleDateString('ja', {
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-        });
-}
 /**
  *　あらゆる時刻表記をDateTimeに変換する。
  *  "2018-10-07T05:02:13.243000+00:00"
