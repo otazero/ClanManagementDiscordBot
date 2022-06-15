@@ -3,6 +3,8 @@ const fs = require('fs');
 const ini = require('ini');
 
 const {WotbUser, ThunderUser, DiscordUser} = require('../structures/profile');
+const {shapDatetime} = require('../change-datetime-type/toDatetime');
+const {WhatYourIgn}= require('../what-your-Ign/whatYourIgn');
 
 const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
@@ -10,10 +12,12 @@ const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
 /**
  * 3つのAPIを統合したクラス(WarThunder, Wotb, Discord)
+ * 戻り値はUserクラス
  */
 class integrationApiRequest{
     /** @returns {promise[]}  */
     static requestThunder(){
+        // スクレイピング
         return ;
     }
 
@@ -65,11 +69,12 @@ class Jsontouserclass{
     /** @returns {DiscordUser[]}  */
     static discord(data){
         const users = data.filter(member => !(member.user.bot === true)).map(member => {
+            const day = new shapDatetime(member.joined_at);
             let user = new DiscordUser();
             user.id = Number(member.user.id);
-            user.ign = null;
+            user.ign = WhatYourIgn.getign(member.user.username, member.nick);
             user.role = null;
-            user.enter_at = null;
+            user.enter_at = day.getDateTime;
             user.username = member.user.username;
             user.wotbid = null;
             user.thunderid = null;
@@ -83,11 +88,12 @@ class Jsontouserclass{
         let users = [];
         Object.keys(data).forEach((id) => {
             const member = data[''+id];
+            const day = new shapDatetime(member.joined_at);
             let user = new WotbUser();
             user.id = Number(id);
             user.ign = member.account_name;
             user.role = null;
-            user.enter_at = null;
+            user.enter_at = day.getDateTime;
             users.push(user);
         });
         return users;
@@ -96,4 +102,5 @@ class Jsontouserclass{
 
 // console.log(otherModule)
 integrationApiRequest.requestDiscord().then(body => console.log(body));
+integrationApiRequest.requestWotb().then(body => console.log(body));
 
