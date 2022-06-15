@@ -23,11 +23,11 @@ class shapDatetime{
         switch (typeof(dt)) {
             case 'string':
                 if((dt[2] === '.' && dt[5] === '.') && dt.length === 10){
-                    console.log(`${dt}はイギリス式`);
+                    //console.log(`${dt}はイギリス式`);
                     this.#britishStyle(dt);
                 }
                 else if(((((dt[4] === '-' && dt[7] === '-') && dt[10] === 'T') && dt[13] === ':') && dt[16]=== ':') && (dt.length === 32)){
-                    console.log(`${dt}はISO`);
+                    //console.log(`${dt}はISO`);
                     this.#iso8061(dt);
                 }
                 
@@ -36,11 +36,11 @@ class shapDatetime{
             case 'number':
                 const numstr = '' + dt;
                 if(numstr.length === 10){
-                    console.log(`${dt}は10桁のtimestamp`);
+                    //console.log(`${dt}は10桁のtimestamp`);
                     dt *= 1000;
                 }
                 else if (numstr.length === 13){
-                    console.log(`${dt}は13桁のtimestamp`);
+                    //console.log(`${dt}は13桁のtimestamp`);
                 }
                 else{
                     break;
@@ -49,7 +49,7 @@ class shapDatetime{
                 break;
             case 'object':
                 if(dt.constructor.name === 'Date'){
-                    console.log(`${dt}はDate型`);
+                    //console.log(`${dt}はDate型`);
                     this.#datetype(dt);
                 }
                 break;
@@ -141,4 +141,8 @@ class shapDatetime{
     get getDateTime(){
         return this.year + '-' + this.month + '-' +this.day + ' ' + this.hour + ':' + this.min + ':' + this.sec;
     }
+}
+
+module.exports = {
+    shapDatetime
 }
