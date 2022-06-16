@@ -3,7 +3,6 @@ const fs = require('fs');
 const ini = require('ini');
 const { PassThrough } = require("stream");
 const {ThunderUser} = require('../structures/profile');
-const {shapDatetime} = require('../change-datetime-type/toDatetime');
 
 const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
@@ -41,15 +40,14 @@ class Scrape{
                         break;
                     case 5:
                         //console.log(value.children[0].data.replace(/\s+/g, ''));
-                        const day = new shapDatetime(value.children[0].data.replace(/\s+/g, ''));
-                        users[i].enter_at = day.getDate;
+                        users[i].setEnter = value.children[0].data.replace(/\s+/g, '');
                         break;
                     default:
                         break;
                 }
             }
         });
-        console.log(users);
+        console.log(users[120]);
         return users;
     }
 }
