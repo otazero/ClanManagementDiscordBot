@@ -3,8 +3,8 @@ const fs = require('fs');
 const ini = require('ini');
 
 const {WotbUser, ThunderUser, DiscordUser} = require('../structures/profile');
-const {shapDatetime} = require('../change-datetime-type/toDatetime');
-const {WhatYourIgn}= require('../what-your-Ign/whatYourIgn');
+
+const {WhatYourIgn}= require('../what-your-Info/whatYourInfo');
 
 const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
@@ -69,12 +69,11 @@ class Jsontouserclass{
     /** @returns {DiscordUser[]}  */
     static discord(data){
         const users = data.filter(member => !(member.user.bot === true)).map(member => {
-            const day = new shapDatetime(member.joined_at);
             let user = new DiscordUser();
             user.id = Number(member.user.id);
             user.ign = WhatYourIgn.getign(member.user.username, member.nick);
             user.role = null;
-            user.enter_at = day.getDateTime;
+            user.setEnter = member.joined_at;
             user.username = member.user.username;
             user.wotbid = null;
             user.thunderid = null;
@@ -88,12 +87,11 @@ class Jsontouserclass{
         let users = [];
         Object.keys(data).forEach((id) => {
             const member = data[''+id];
-            const day = new shapDatetime(member.joined_at);
             let user = new WotbUser();
             user.id = Number(id);
             user.ign = member.account_name;
             user.role = null;
-            user.enter_at = day.getDateTime;
+            user.setEnter = member.joined_at;
             users.push(user);
         });
         return users;
