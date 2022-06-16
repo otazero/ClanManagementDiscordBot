@@ -1,4 +1,6 @@
+const {shapDatetime} = require('../change-datetime-type/toDatetime');
 /* Userクラス */
+
 
 /**
  * ユーザークラスの基本型
@@ -17,6 +19,18 @@ class User {
         this.left_at = null;
         /** @type {Boolean}  在籍フラグ。Trueでいる。*/
         this.isflag = true;
+    }
+    /**
+     * @param {number|string} day
+     */
+    set setEnter(day){
+        this.enter_at = new shapDatetime(day); 
+    }
+    /**
+     * @param {number|string} day
+     */
+    set setLeft(day){
+        this.left_at = new shapDatetime(day); 
     }
 }
 
