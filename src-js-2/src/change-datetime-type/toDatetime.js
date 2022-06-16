@@ -70,9 +70,12 @@ class shapDatetime{
                 date.year += dt[i];
             }
         }
-        this.year = Number(date.year);
-        this.month = Number(date.month);
-        this.day = Number(date.day);
+        this.year = date.year;
+        this.month = date.month;
+        this.day = date.day;
+        this.hour = '00';
+        this.min = '00';
+        this.sec = '00';
     }
     #iso8061(dt){
         const datepack = dt.split(/-|:|T|\+/);
@@ -116,6 +119,9 @@ class shapDatetime{
         this.min = min;
         this.sec = sec;
     }
+    #hutaketa(num){
+        return (num>9)?''+num:'0'+num;
+    }
     /**
      * @returns {string} 月
      */
@@ -133,6 +139,9 @@ class shapDatetime{
      */
     get getDateTime(){
         return this.year + '-' + this.month + '-' +this.day + ' ' + this.hour + ':' + this.min + ':' + this.sec;
+    }
+    get getDateType(){
+        return new Date(this.year, this.month - 1, this.day, this.hour, this.min, this.sec);
     }
 }
 
