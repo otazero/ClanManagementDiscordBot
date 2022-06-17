@@ -36,7 +36,7 @@ class Scrape{
                         break;
                     case 4:
                         //　console.log(value.children[0].data.replace(/\s+/g, ''));
-                        users[i].role = value.children[0].data.replace(/\s+/g, '');
+                        users[i].setrole = [value.children[0].data.replace(/\s+/g, '')];
                         break;
                     case 5:
                         //console.log(value.children[0].data.replace(/\s+/g, ''));
@@ -47,7 +47,6 @@ class Scrape{
                 }
             }
         });
-        console.log(users[120]);
         return users;
     }
 }

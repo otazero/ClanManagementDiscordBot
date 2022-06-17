@@ -2,9 +2,11 @@ const request = require('request');
 const fs = require('fs');
 const ini = require('ini');
 
-const {WotbUser, ThunderUser, DiscordUser} = require('../structures/profile');
+const {WotbUser, DiscordUser} = require('../structures/profile');
 
-const {WhatYourIgn}= require('../what-your-Info/whatYourInfo');
+const {WhatYourIgn} = require('../what-your-Info/whatYourInfo');
+
+const {Scrape} = require('./scraping');
 
 const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
@@ -18,7 +20,7 @@ class integrationApiRequest{
     /** @returns {promise[]}  */
     static requestThunder(){
         // スクレイピング
-        return ;
+        return Scrape.thunderClanTable();
     }
 
     /** @returns {promise[]}  */
@@ -72,7 +74,7 @@ class Jsontouserclass{
             let user = new DiscordUser();
             user.id = Number(member.user.id);
             user.ign = WhatYourIgn.getign(member.user.username, member.nick);
-            user.role = null;
+            user.setrole = member.roles;
             user.setEnter = member.joined_at;
             user.username = member.user.username;
             user.wotbid = null;
@@ -90,7 +92,7 @@ class Jsontouserclass{
             let user = new WotbUser();
             user.id = Number(id);
             user.ign = member.account_name;
-            user.role = null;
+            user.setrole = [member.role];
             user.setEnter = member.joined_at;
             users.push(user);
         });
@@ -99,6 +101,11 @@ class Jsontouserclass{
 }
 
 // console.log(otherModule)
-integrationApiRequest.requestDiscord().then(body => console.log(body));
-integrationApiRequest.requestWotb().then(body => console.log(body));
+//integrationApiRequest.requestDiscord().then(body => console.log(body[0].role));
+//integrationApiRequest.requestWotb().then(body => console.log(body));
+//integrationApiRequest.requestThunder().then(body => console.log(body));
 
+
+module.exports = {
+    integrationApiRequest
+}
