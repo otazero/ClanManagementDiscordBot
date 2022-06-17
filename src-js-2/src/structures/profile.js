@@ -1,4 +1,7 @@
+const {shapDatetime} = require('../change-datetime-type/toDatetime');
+const {roles} = require('./role');
 /* Userクラス */
+
 
 /**
  * ユーザークラスの基本型
@@ -17,6 +20,24 @@ class User {
         this.left_at = null;
         /** @type {Boolean}  在籍フラグ。Trueでいる。*/
         this.isflag = true;
+    }
+    /**
+     * @param {string[]|number[]} roleinfo APIの結果をリストで渡す
+     */
+    set setrole(roleinfo){
+        this.role = new roles(roleinfo);
+    }
+    /**
+     * @param {number|string} day
+     */
+    set setEnter(day){
+        this.enter_at = new shapDatetime(day); 
+    }
+    /**
+     * @param {number|string} day
+     */
+    set setLeft(day){
+        this.left_at = new shapDatetime(day); 
     }
 }
 
