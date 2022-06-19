@@ -10,3 +10,7 @@
 
 自称一番見やすく書いてるバージョン？
 src-js-2
+
+mysql -u root -p
+create database clandb;
+drop database clandb;

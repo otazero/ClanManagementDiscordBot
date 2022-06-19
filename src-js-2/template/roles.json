@@ -47,15 +47,15 @@
         "id":7,
         "name":"士官",
         "othername":["Officer"],
-        "discordid":null,
-        "type":"sub"
+        "discordid":"491578007392092170",
+        "type":"main"
     },
     {
         "id":8,
         "name":"軍曹",
         "othername":["Sergeant"],
-        "discordid":null,
-        "type":"sub"
+        "discordid":"491578007392092170",
+        "type":"main"
     },
     {
         "id":9,

@@ -16,7 +16,7 @@ const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
  * 3つのAPIを統合したクラス(WarThunder, Wotb, Discord)
  * 戻り値はUserクラス
  */
-class integrationApiRequest{
+class IntegrationApiRequest{
     /** @returns {promise[]}  */
     static requestThunder(){
         // スクレイピング
@@ -101,11 +101,11 @@ class Jsontouserclass{
 }
 
 // console.log(otherModule)
-//integrationApiRequest.requestDiscord().then(body => console.log(body[0].role));
+//integrationApiRequest.requestDiscord().then(body => console.log(body));
 //integrationApiRequest.requestWotb().then(body => console.log(body));
 //integrationApiRequest.requestThunder().then(body => console.log(body));
 
 
 module.exports = {
-    integrationApiRequest
+    IntegrationApiRequest
 }

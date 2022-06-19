@@ -63,6 +63,14 @@ class ThunderUser extends User {
         this.nowactive = 0;
         /** @type {number}  総アクティブ*/
         this.allactive = 0;
+
+        /**
+         * アクティブ履歴テーブル入れる
+         */
+        this.activestory = [];
+    }
+    setActive(){
+        this.allactive += this.nowactive;
     }
 }
 
@@ -83,6 +91,28 @@ class DiscordUser extends User {
         this.nick = null;
         /** @type {?number}  サブ垢ID*/
         this.sub = null;
+    }
+    /**
+     * createdbの戻り値をもとに行う
+     * @param {obj} wotbuserclass
+     * @param {obj} thunderuserclass
+     */
+    setgameid(wotbuserclass, thunderuserclass){
+        this.role.sub.forEach(role => {
+            if(role.name === 'WorldOfTanksBlitz'){
+                wotbuserclass.forEach(element => {
+                    if(element.ign === this.ign){
+                        this.wotbid = element.id;
+                    }
+                });
+            }else if(role.name === 'WarThunder'){
+                thunderuserclass.forEach(element => {
+                    if(element.ign === this.ign){
+                        this.thunderid = element.id;
+                    }
+                });
+            }
+        });
     }
 }
 

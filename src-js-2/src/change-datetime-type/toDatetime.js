@@ -79,7 +79,7 @@ class shapDatetime{
     }
     #iso8061(dt){
         const datepack = dt.split(/-|:|T|\+/);
-        const sec = Math.round(Number(datepack[5]));
+        const sec = Math.floor(Number(datepack[5]));
         this.year = datepack[0];
         this.month = datepack[1];
         this.day = datepack[2];

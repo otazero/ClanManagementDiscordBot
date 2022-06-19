@@ -55,7 +55,8 @@ class WhatYourRole{
                 }
             }).filter(Boolean);
             return templi[0];
-        });
+        }).filter(Boolean);
+        //console.log(roleinfolist);
         return roleinfolist;
     }
 }
