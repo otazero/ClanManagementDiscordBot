@@ -54,6 +54,10 @@ class OperationDatabase{
         }
     }
     static async #InsertWotb(userclasslist){
+        /* SELECT * FROM ~ */
+        /* で決める */
+
+        
         let mycon = null;
         try {
             mycon = await mysql.createConnection(db_setting);
