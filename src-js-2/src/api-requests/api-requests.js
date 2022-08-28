@@ -86,16 +86,19 @@ class Jsontouserclass{
     }
     /** @returns {WotbUser[]}  */
     static wotb(data){
-        let users = [];
-        Object.keys(data).forEach((id) => {
-            const member = data[''+id];
-            let user = new WotbUser();
-            user.id = Number(id);
-            user.ign = member.account_name;
-            user.setrole = [member.role];
-            user.setEnter = member.joined_at;
-            users.push(user);
-        });
+        const users = ((data)=>{
+            let result = [];
+            Object.keys(data).forEach((id) => {
+                const member = data[''+id];
+                let user = new WotbUser();
+                user.id = Number(id);
+                user.ign = member.account_name;
+                user.setrole = [member.role];
+                user.setEnter = member.joined_at;
+                result.push(user);
+            });
+            return result;
+        })(data);
         return users;
     }
 }
