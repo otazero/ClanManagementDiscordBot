@@ -24,9 +24,7 @@ class Daily{
         // APIリクエストを飛ばして 既存データベースの内容もクラス化
         let [discordusers, wotbusers, thunderusers] = await Promise.all([IntegrationApiRequest.requestDiscord(), IntegrationApiRequest.requestWotb(), IntegrationApiRequest.requestThunder()]);
         // 重複してない人をDBにinsert(新規参加) & 参加者リストを返す
-        //OperationDatabase.Insert(wotbusers, "Wotb");
-        OperationDatabase.Daily(wotbusers);
-        //OperationDatabase.oldDatabaseInfo();
+        OperationDatabase.Daily(wotbusers, thunderusers);
         // APIにいない且つDBの在籍フラグがTrueは退室者
     }
 }
