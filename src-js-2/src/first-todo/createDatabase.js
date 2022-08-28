@@ -98,7 +98,7 @@ class CreateDataBase{
         let insert = "";
         const length = roleData.length - 1;
         roleData.forEach((body, index) => {
-            insert += `(${body.id}, '${body.name}', ${body.discordid})`;
+            insert += `(${body.id}, '${body.name}', '${body.discordid}')`;
             if(index<length){
                 insert += ",";
             }
@@ -120,7 +120,7 @@ class CreateDataBase{
                 (
                     r_id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
                     r_name VARCHAR(20) UNIQUE NOT NULL,
-                    r_dis_id BIGINT
+                    r_dis_id VARCHAR(18)
                 )
             `),
             /* wotbメンバーテーブル */
