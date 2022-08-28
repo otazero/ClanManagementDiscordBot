@@ -1,5 +1,6 @@
 const {shapDatetime} = require('../change-datetime-type/toDatetime');
 const {roles} = require('./role');
+const {Activestory} = require('./activity');
 /* Userクラス */
 
 
@@ -66,11 +67,21 @@ class ThunderUser extends User {
 
         /**
          * アクティブ履歴テーブル入れる
+         * アクティブ履歴クラス作る?
+         * 
          */
         this.activestory = [];
     }
     setActive(){
         this.allactive += this.nowactive;
+    }
+    /**
+     * @param {___Activestory____[]} activities [{}, {}]のようにデータベースの内容をぶち込む
+     */
+    set setActivestory(activities){
+        this.activestory = activities.map((act) => {
+            return new Activestory(act);
+        });
     }
 }
 
