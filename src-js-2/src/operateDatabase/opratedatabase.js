@@ -93,7 +93,10 @@ class OperationDatabase{
         }
         return enterUsers;
     }
-
+    /**
+     * 
+     * @param {*} newusers APIの結果(ユーザークラス)を渡します 
+     */
     static async Daily(newusers){
         let mycon = null;
         try {
@@ -101,37 +104,80 @@ class OperationDatabase{
         }catch(e){
             console.log(e);
         }
-
-        const [oldusers, gomi] = await mycon.query(`SELECT w_user_id, w_is_flag FROM w_wotb_members WHERE w_is_flag = true`);
-        let reentUserslist = [];
+        //データベースから存在フラグがTrueのだけ受け取ります
+        const [oldusers, gomi] = await mycon.query(`SELECT w_user_id, w_is_flag, w_ign FROM w_wotb_members WHERE w_is_flag = true`);
         let entUserslist = [];
         let leftUserslist = [];
+        //退室者を考えます
         oldusers.forEach(older => {
             let isflag = false;
             newusers.forEach(newer =>{
-                if(newer.id === older.w_user_id){
+                if(newer.id == older.w_user_id){
                     isflag = true;
                 }
             });
-            if(isflag){
+            if(!isflag){
                 /*　要:ユーザークラス化 */
                 leftUserslist.push(older);
             }
         });
+        //入室者を考えます
         newusers.forEach(newer => {
             let isflag = false;
             oldusers.forEach(older =>{
-                if(older.id === older.w_user_id){
+                if(newer.id == older.w_user_id){
                     isflag = true;
                 }
             });
-            if(isflag){
+            if(!isflag){
                 /*　要:ユーザークラス化 */
-                leftUserslist.push(older);
+                entUserslist.push(newer);
             }
         });
+        console.log("退室");
+        console.log(leftUserslist);
+        console.log("入室");
+        console.log(entUserslist);
 
-
+        //await mycon.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at, w_is_flag) VALUES ${test} AS new ON DUPLICATE KEY UPDATE w_is_flag = new.w_is_flag`);
+        
+        const lefters = ((olds, news) => {
+            let result = [];
+            olds.forEach(older => {
+                let isflag = false;
+                news.forEach(newer =>{
+                    if(newer.id == older.w_user_id){
+                        isflag = true;
+                    }
+                });
+                if(!isflag){
+                    /*　要:ユーザークラス化 */
+                    result.push(older);
+                }
+            });
+            return result;
+        })(oldusers, newusers);
+        
+        const enters = ((olds, news) => {
+            let result = [];
+            news.forEach(newer => {
+                let isflag = false;
+                olds.forEach(older =>{
+                    if(newer.id == older.w_user_id){
+                        isflag = true;
+                    }
+                });
+                if(!isflag){
+                    /*　要:ユーザークラス化 */
+                    result.push(newer);
+                }
+            });
+            return result;
+        })(oldusers, newusers);
+        console.log("退室");
+        console.log(lefters);
+        console.log("入室");
+        console.log(enters);
         if( mycon ){
             mycon.end();
         }
