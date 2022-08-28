@@ -145,7 +145,7 @@ class CreateDataBase{
             con.query(`
                 CREATE TABLE IF NOT EXISTS t_wt_members
                 (
-                    t_user_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+                    t_user_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
                     t_ign VARCHAR(16) UNIQUE NOT NULL,
                     r_id TINYINT UNSIGNED NOT NULL,
                     t_enter_at DATE,
@@ -200,7 +200,8 @@ class CreateDataBase{
             con.query(`
                 CREATE TABLE IF NOT EXISTS wt_actives
                 (
-                    t_user_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
+                    wt_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+                    t_user_id INT UNSIGNED NOT NULL,
                     wt_active SMALLINT NOT NULL,
                     wt_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     INDEX wta_index_index(t_user_id),
@@ -208,7 +209,6 @@ class CreateDataBase{
                         FOREIGN KEY (t_user_id) 
                             REFERENCES t_wt_members (t_user_id)
                             ON DELETE RESTRICT ON UPDATE CASCADE
-
                 )
             `)
         ]);
