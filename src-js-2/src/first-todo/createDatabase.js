@@ -59,7 +59,7 @@ class CreateDataBase{
         let insert = "";
         const length = discordusers.length - 1;
         discordusers.forEach((body, index) => {
-            insert += `(${body.id}, '${body.username}', ${body.wotbid}, ${body.thunderid}, ${body.role.main.id}, '${body.nick}', '${body.ign}', '${body.enter_at.getDateTime}')`;
+            insert += `(${body.id}, '${body.username}', ${body.wotbClass.id}, ${body.thunderClass.id}, ${body.role.main.id}, '${body.nick}', '${body.ign}', '${body.enter_at.getDateTime}')`;
             if(index<length){
                 insert += ",";
             }
