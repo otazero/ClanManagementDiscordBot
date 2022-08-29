@@ -21,13 +21,13 @@ class OperationDatabase{
      */
     static async Daily(wotbNewusers, thunderNewusers){
         /** Wotb **/
-        let mycon = null;
-        try {
-            mycon = await mysql.createConnection(db_setting);
-        }catch(e){
-            console.log(e);
-        }
         const wotbDaily = (async(newusers)=>{
+            let mycon = null;
+            try {
+                mycon = await mysql.createConnection(db_setting);
+            }catch(e){
+                console.log(e);
+            }
             //データベースから存在フラグがTrueのだけ受け取ります
             const [oldusers, gomi] = await mycon.query(`SELECT * FROM w_wotb_members NATURAL INNER JOIN r_roles WHERE w_is_flag = true `);
             
@@ -73,11 +73,6 @@ class OperationDatabase{
                 return result;
             })(oldusers, newusers);
             
-            console.log("B退室");
-            console.log(lefters);
-            console.log("B入室");
-            console.log(enters);
-            
             //退室者に関するデータベース操作
             if(lefters.length){
                 (async(mycon)=> {
@@ -101,6 +96,11 @@ class OperationDatabase{
                     const [result, gomi] = await mycon.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at, w_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE w_is_flag = new.w_is_flag`);
                 })(mycon);
             }
+            //デバグ
+            console.log("B退室");
+            console.log(lefters);
+            console.log("B入室");
+            console.log(enters);
             if( mycon ){
                 mycon.end();
             }
@@ -115,6 +115,7 @@ class OperationDatabase{
             }catch(e){
                 console.log(e);
             }
+            
             //データベースから存在フラグがTrueのだけ受け取ります
             const [oldusers, gomi] = await mycon.query(`SELECT * FROM t_wt_members NATURAL INNER JOIN r_roles WHERE t_is_flag = true `);
             //退室者を考えます
@@ -123,7 +124,7 @@ class OperationDatabase{
                 olds.forEach(older => {
                     let isflag = false;
                     news.forEach(newer =>{
-                        if(newer.id == older.t_user_id){
+                        if(newer.ign == older.t_ign){
                             isflag = true;
                         }
                     });
@@ -150,7 +151,7 @@ class OperationDatabase{
                 news.forEach(newer => {
                     let isflag = false;
                     olds.forEach(older =>{
-                        if(newer.id == older.t_user_id){
+                        if(newer.ign == older.t_ign){
                             isflag = true;
                         }
                     });
@@ -160,13 +161,45 @@ class OperationDatabase{
                 });
                 return result;
             })(oldusers, newusers);
-            console.log("TH退室");
-            //console.log(lefters);
-            console.log("TH入室");
-            //console.log(enters);
+            
+           //退室者に関するデータベース操作
+            if(lefters.length){
+                (async(mycon)=> {
+                    let text = '';
+                    lefters.forEach(lefter => {
+                        text += `t_user_id = ${lefter.id} or `;
+                    });
+                    const q_text = text.slice(0, -3);
+                    const day = new shapDatetime();
+                    const [result, gomi] = await mycon.query(`UPDATE t_wt_members SET t_is_flag = false, t_left_at = '${day.getDateTime}' WHERE ${q_text}`);
+                })(mycon);
+            }
+            //入室者に関するデータベース操作
+            if(enters.length){
+                await Promise.all(enters.map(async(user) => {
+                    const [result, gomi] = await mycon.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_is_flag) VALUES ('${user.ign}', ${user.role.main.id}, '${user.enter_at.getDateTime}', true) AS new ON DUPLICATE KEY UPDATE t_is_flag = new.t_is_flag`);
+                    user.id = result.insertId;
+                    console.log("User.id", user.id, "DB入れたとこ", result.insertId);
+                    return 0;
+                }));       
+            }
+            
+            //デバグ
+            console.log("TH退室", lefters.length);
+            lefters.forEach(m => {
+                console.log(m.id, m.ign, m.nowactive, m.allactive);
+            });
+            console.log("\n\n\n");
+            console.log("TH入室", enters.length);
+            enters.forEach(m => {
+                console.log(m.id, m.ign, m.nowactive, m.allactive);
+            });
+            
+
             if( mycon ){
                 mycon.end();
             }
+            return {lefters:lefters, enters:enters};
         })(thunderNewusers);
 
     }
