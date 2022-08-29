@@ -1,5 +1,6 @@
 const mysql = require("mysql2/promise");
 const {WotbUser, DiscordUser, ThunderUser} = require('../structures/profile');
+const {shapDatetime} = require('../change-datetime-type/toDatetime');
 
 // 秘密ファイル
 const fs = require('fs');
@@ -85,7 +86,8 @@ class OperationDatabase{
                         text += `w_user_id = ${lefter.id} or `;
                     });
                     const q_text = text.slice(0, -3);
-                    const [result, gomi] = await mycon.query(`UPDATE w_wotb_members SET w_is_flag = false WHERE ${q_text}`);
+                    const day = new shapDatetime();
+                    const [result, gomi] = await mycon.query(`UPDATE w_wotb_members SET w_is_flag = false, w_left_at = '${day.getDateTime}' WHERE ${q_text}`);
                 })(mycon);
             }
             //入室者に関するデータベース操作
@@ -161,7 +163,7 @@ class OperationDatabase{
             console.log("TH退室");
             //console.log(lefters);
             console.log("TH入室");
-            console.log(enters);
+            //console.log(enters);
             if( mycon ){
                 mycon.end();
             }
