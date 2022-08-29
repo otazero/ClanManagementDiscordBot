@@ -94,14 +94,14 @@ class DiscordUser extends User {
         super();
         /** @type {?String}  ユーザー名*/
         this.username = null;
-        /** @type {?number}  wotbID*/
-        this.wotbid = null;
-        /** @type {?number}  WtID*/
-        this.thunderid = null;
+        /** @type {?WotbUser}  wotbClass*/
+        this.wotbClass = null;
+        /** @type {?ThunderUser}  WtClass*/
+        this.thunderClass = null;
         /** @type {?String}  ニックネーム*/
         this.nick = null;
-        /** @type {?number}  サブ垢ID*/
-        this.sub = null;
+        /** @type {?DiscordUser}  サブ垢のUserclass*/
+        this.subClass = null;
     }
     /**
      * createdbの戻り値をもとに行う
@@ -113,13 +113,13 @@ class DiscordUser extends User {
             if(role.name === 'WorldOfTanksBlitz'){
                 wotbuserclass.forEach(element => {
                     if(element.ign === this.ign){
-                        this.wotbid = element.id;
+                        this.wotbClass = element;
                     }
                 });
             }else if(role.name === 'WarThunder'){
                 thunderuserclass.forEach(element => {
                     if(element.ign === this.ign){
-                        this.thunderid = element.id;
+                        this.thunderClass = element;
                     }
                 });
             }

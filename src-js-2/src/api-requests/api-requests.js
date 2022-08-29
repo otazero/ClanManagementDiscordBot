@@ -77,8 +77,8 @@ class Jsontouserclass{
             user.setrole = member.roles;
             user.setEnter = member.joined_at;
             user.username = member.user.username;
-            user.wotbid = null;
-            user.thunderid = null;
+            user.wotbClass = null;
+            user.thunderClass = null;
             user.nick = member.nick;
             return user;
         });
