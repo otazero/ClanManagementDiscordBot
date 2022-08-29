@@ -131,7 +131,7 @@ class CreateDataBase{
                     w_ign VARCHAR(24) UNIQUE NOT NULL,
                     r_id TINYINT UNSIGNED NOT NULL,
                     w_enter_at DATETIME,
-                    w_left_at DATE,
+                    w_left_at DATETIME,
                     w_is_flag BOOLEAN DEFAULT true NOT NULL,
                     INDEX rw_index(r_id),
                     CONSTRAINT fk_rw_id
