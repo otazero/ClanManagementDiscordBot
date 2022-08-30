@@ -347,7 +347,6 @@ class OperationDatabase{
                     }
                     user.username = dbuser.d_name;
                     user.nick = dbuser.d_nick;
-                    //要検討
                     if(dbuser.w_user_id){
                         const [wotbUsers, gomi1] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${dbuser.w_user_id}`);
                         const wotbUser = await this.#dbToUsers(wotbUsers);
