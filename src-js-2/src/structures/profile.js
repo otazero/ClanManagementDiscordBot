@@ -9,7 +9,7 @@ const {Activestory} = require('./activity');
  */
 class User {
     constructor() {
-        /** @type {?number}  ユーザーID*/
+        /** @type {?number|String}  ユーザーID*/
         this.id = null;
         /** @type {?String}  IGN*/
         this.ign = null;

@@ -15,6 +15,9 @@ const db_setting = {
     user: config.Database.user,
     password: config.Database.password,
     database: 'clandb',
+
+    supportBigNumbers: true, // BigNumberサポート有効化
+    bigNumberStrings: true, // BigNumberを文字列として扱う
 };
 
 class CreateDataBase{
