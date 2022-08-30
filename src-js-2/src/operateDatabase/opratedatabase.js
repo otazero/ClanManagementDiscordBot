@@ -188,17 +188,16 @@ class OperationDatabase{
             }
             
             //デバグ
-            /*
+            console.log("\n\n\n");
             console.log("TH退室", lefters.length);
             lefters.forEach(m => {
                 console.log(m.id, m.ign, m.nowactive, m.allactive);
             });
-            console.log("\n\n\n");
             console.log("TH入室", enters.length);
             enters.forEach(m => {
                 console.log(m.id, m.ign, m.nowactive, m.allactive);
             });
-            */
+            
             if( mycon ){
                 mycon.end();
             }
@@ -225,9 +224,9 @@ class OperationDatabase{
             //データベースから存在フラグがTrueのだけ受け取ります
             const [oldusers, gomi] = await mycon.query(`SELECT * FROM d_discord_members NATURAL INNER JOIN r_roles WHERE d_is_flag = true`);
             //退室者を考えます
-            const lefters = ((olds, news) => {
-                let result = [];
-                olds.forEach(older => {
+            const lefters = (async(olds, news) => {
+                const result = [];
+                for(let older of olds){
                     let isflag = false;
                     news.forEach(newer =>{
                         if(newer.id == older.d_user_id){
@@ -246,11 +245,26 @@ class OperationDatabase{
                         }
                         user.username = older.d_name;
                         user.nick = older.d_nick;
-                        user.setgameid();
                         user.isflag = false;
+                        if(older.w_user_id){
+                            const [wotbUsers, gomi1] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${older.w_user_id}`);
+                            const wotbUser = await this.#dbToUsers(wotbUsers);
+                            user.wotbClass = wotbUser[0];
+                        }
+                        if(older.t_user_id){
+                            const [thunderUsers, gomi2] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_user_id = ${older.t_user_id}`);
+                            const thunderUser = await this.#dbToUsers(thunderUsers);
+                            user.thunderClass = thunderUser[0];
+                        }
+                        if(older.d_sub_id){
+                            const [discordUsers, gomi3] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${Number(older.d_sub_id)}`);
+                            const discordUser = await this.#dbToUsers(discordUsers);
+                            user.subClass = discordUser[0];
+                        }
                         result.push(user);
                     }
-                });
+                }
+                
                 return result;
             })(oldusers, newusers);
             //入室者を考えます
@@ -269,15 +283,20 @@ class OperationDatabase{
                 });
                 return result;
             })(oldusers, newusers);
-            const [test1, test2] = await Promise.all([wotbDaily, thunderDaily]);
             
-            console.log("\n\n\n");
-            oldusers.forEach(element => {
-                console.log(element.d_user_id ,element.d_name, element.d_ign);
+            
+            
+            lefters.then(v => {
+                console.log("\n\n\n");
+                console.log("D退室");
+                v.forEach(left => {
+                    console.log(left.id, left.username, left.nick, left.ign,left.role);
+                });
+                console.log(enters);
+                if( mycon ){
+                    mycon.end();
+                }
             });
-            if( mycon ){
-                mycon.end();
-            }
         })(discordNewusers);
 
     }
@@ -292,29 +311,58 @@ class OperationDatabase{
         // どのテーブルか判断する
         if(Object.keys(dbusers[0]).includes('d_user_id')){
             const discordClasses = (async(dbusers)=>{
-                const classUsers = dbusers.map((dbuser)=>{
+                let mycon = null;
+                try {
+                    mycon = await mysql.createConnection(db_setting);
+                }catch(e){
+                    console.log(e);
+                }
+                const classUsers = await Promise.all(dbusers.map(async(dbuser)=>{
                     let user = new DiscordUser();
                     user.id = dbuser.d_user_id;
                     user.ign = dbuser.d_ign;
                     user.setrole = [dbuser.r_dis_id];
                     user.setEnter = dbuser.d_enter_at;
-                    if(older.d_left_at){
+                    if(dbuser.d_left_at){
                         user.setLeft = dbuser.d_left_at;
                     }
                     user.username = dbuser.d_name;
                     user.nick = dbuser.d_nick;
                     //要検討
-                    user.setgameid();
+                    if(dbuser.w_user_id){
+                        const [wotbUsers, gomi1] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${dbuser.w_user_id}`);
+                        const wotbUser = await this.#dbToUsers(wotbUsers);
+                        user.wotbClass = wotbUser[0];
+                    }
+                    if(dbuser.t_user_id){
+                        const [thunderUsers, gomi2] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_user_id = ${dbuser.t_user_id}`);
+                        const thunderUser = await this.#dbToUsers(thunderUsers);
+                        user.thunderClass = thunderUser[0];
+                    }
                     user.isflag = dbuser.d_is_flag;
+                    if(dbuser.d_sub_id){
+                        const [discordUsers, gomi3] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${Number(dbuser.d_sub_id)}`);
+                        const discordUser = await this.#dbToUsers(discordUsers);
+                        user.subClass = discordUser[0];
+                    }
                     return user;
-                });
+                }));
+                if( mycon ){
+                    mycon.end();
+                }
                 return classUsers;
             })(dbusers);
             return discordClasses;
         }
         else if(Object.keys(dbusers[0]).includes('w_user_id')){
             const wotbClasses = (async(dbusers)=>{
-                const classUsers = dbusers.map((dbuser)=>{
+                let mycon = null;
+                try {
+                    mycon = await mysql.createConnection(db_setting);
+                }catch(e){
+                    console.log(e);
+                }
+                const classUsers = await Promise.all(dbusers.map(async(dbuser)=>{
                     let user = new WotbUser();
                     user.id = dbuser.w_user_id;
                     user.ign = dbuser.w_ign;
@@ -325,7 +373,10 @@ class OperationDatabase{
                     }
                     user.isflag = dbuser.w_is_flag;
                     return user;
-                });
+                }));
+                if( mycon ){
+                    mycon.end();
+                }
                 return classUsers;
             })(dbusers);
             return wotbClasses;
@@ -338,21 +389,21 @@ class OperationDatabase{
                 }catch(e){
                     console.log(e);
                 }
-                const classUsers = dbusers.map((dbuser)=>{
-                    const [result, gomi] = mycon.query(`SELECT * FROM wt_actives WHERE t_user_id = ${dbusers.t_user_id}`);
+                const classUsers = await Promise.all(dbusers.map(async(dbuser)=>{
+                    const [result, gomi] = await mycon.query(`SELECT * FROM wt_actives WHERE t_user_id = ${dbuser.t_user_id}`);
                     let user = new ThunderUser();
-                    user.id = dbusers.t_user_id;
-                    user.ign = dbusers.t_ign;
-                    user.setrole = [dbusers.r_dis_id];
-                    user.setEnter = dbusers.t_enter_at;
-                    if(dbusers.t_left_at){
-                        user.setLeft = dbusers.t_left_at;
+                    user.id = dbuser.t_user_id;
+                    user.ign = dbuser.t_ign;
+                    user.setrole = [dbuser.r_dis_id];
+                    user.setEnter = dbuser.t_enter_at;
+                    if(dbuser.t_left_at){
+                        user.setLeft = dbuser.t_left_at;
                     }
-                    user.allactive = dbusers.t_all_active;
-                    user.isflag = dbusers.t_is_flag;
+                    user.allactive = dbuser.t_all_active;
+                    user.isflag = dbuser.t_is_flag;
                     user.setActivestory = result;
                     return user;
-                });
+                }));
                 if( mycon ){
                     mycon.end();
                 }
