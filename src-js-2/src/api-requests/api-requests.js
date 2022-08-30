@@ -72,7 +72,7 @@ class Jsontouserclass{
     static discord(data){
         const users = data.filter(member => !(member.user.bot === true)).map(member => {
             let user = new DiscordUser();
-            user.id = Number(member.user.id);
+            user.id = member.user.id;
             user.ign = WhatYourIgn.getign(member.user.username, member.nick);
             user.setrole = member.roles;
             user.setEnter = member.joined_at;
