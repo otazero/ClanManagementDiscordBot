@@ -203,7 +203,6 @@ class OperationDatabase{
             }
             return {lefters:lefters, enters:enters};
         })(thunderNewusers);
-        const result_test = await Promise.all([wotbDaily, thunderDaily]);
         /** Discord **/
         /**
          * ※Discord入室者の把握
@@ -220,11 +219,10 @@ class OperationDatabase{
             }catch(e){
                 console.log(e);
             }
-            //30日ここから
             //データベースから存在フラグがTrueのだけ受け取ります
             const [oldusers, gomi] = await mycon.query(`SELECT * FROM d_discord_members NATURAL INNER JOIN r_roles WHERE d_is_flag = true`);
             //退室者を考えます
-            const lefters = (async(olds, news) => {
+            const leftersP = (async(olds, news) => {
                 const result = [];
                 for(let older of olds){
                     let isflag = false;
@@ -284,21 +282,42 @@ class OperationDatabase{
                 return result;
             })(oldusers, newusers);
             
-            
-            
-            lefters.then(v => {
-                console.log("\n\n\n");
-                console.log("D退室");
-                v.forEach(left => {
-                    console.log(left.id, left.username, left.nick, left.ign,left.role);
+            const lefters = await leftersP;
+            // 退室者のデータベース操作
+            if(lefters.length){
+                let text = '';
+                lefters.forEach(lefter => {
+                    text += `d_user_id = ${BigInt(lefter.id)} or `;
                 });
-                console.log(enters);
-                if( mycon ){
-                    mycon.end();
-                }
+                const q_text = text.slice(0, -3);
+                const day = new shapDatetime();
+                await mycon.query(`UPDATE d_discord_members SET d_is_flag = false, d_left_at = '${day.getDateTime}' WHERE ${q_text}`);
+            }
+            // 入室者のデータベース操作
+            if(enters.length){
+                let text = '';
+                enters.forEach(enter => {
+                    text += `(${BigInt(enter.id)}, '${enter.username}', '${enter.ign}', '${enter.nick}', ${enter.role.main.id}, '${enter.enter_at.getDateTime}', true),`;
+                });
+                const q_text = text.slice(0, -1);;
+                const [result, gomi] = await mycon.query(`INSERT INTO d_discord_members(d_user_id, d_name, d_ign, d_nick, r_id, d_enter_at, d_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE d_is_flag = new.d_is_flag`);
+            }
+            console.log("\n\n\n");
+            console.log("D退室");
+            console.log(lefters);
+            /*
+            lefters.forEach(left => {
+                console.log(left.id, left.username, left.nick, left.ign,left.role);
+            });*/
+            console.log("D入室");
+            enters.forEach(e =>{
+                console.log(e.id, e.username);
             });
+            if( mycon ){
+                mycon.end();
+            }
         })(discordNewusers);
-
+        const result_test = await Promise.all([wotbDaily, thunderDaily, discordDaily]);
     }
     /**
      * 
@@ -341,7 +360,7 @@ class OperationDatabase{
                     }
                     user.isflag = dbuser.d_is_flag;
                     if(dbuser.d_sub_id){
-                        const [discordUsers, gomi3] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${Number(dbuser.d_sub_id)}`);
+                        const [discordUsers, gomi3] = await mycon.query(`SELECT * FROM d_discord_members WHERE d_user_id = ${BigInt(dbuser.d_sub_id)}`);
                         const discordUser = await this.#dbToUsers(discordUsers);
                         user.subClass = discordUser[0];
                     }
