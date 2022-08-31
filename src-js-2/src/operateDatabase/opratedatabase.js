@@ -203,14 +203,15 @@ class OperationDatabase{
             }
             return {lefters:lefters, enters:enters};
         })(thunderNewusers);
+        const result_test = await Promise.all([wotbDaily, thunderDaily]);
         /** Discord **/
         /**
          * ※Discord入室者の把握
          *  入室者とWT・WotBの紐づけ
          * ※Discord退室者の把握
          *  在籍をflaseにするだけ
-         * ※ゲーム退室者を元老に降格
-         * ※ゲーム入室者をクランメンバーに昇格
+         * ※ゲーム退室者を元老に降格(main)
+         * ※ゲーム入室者をクランメンバーに昇格(main)
          */
         const discordDaily = (async(newusers)=>{
             let mycon = null;
@@ -313,11 +314,26 @@ class OperationDatabase{
             enters.forEach(e =>{
                 console.log(e.id, e.username);
             });
+
+            /**
+            * ※データベースのdiscord ignを最新にする〇
+            * ※WTとWotbをDiscordと紐づける
+            */
+            //1日ここから
+            await Promise.all(newusers.map(async(user)=>{
+                await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}' WHERE d_user_id = ${BigInt(user.id)}`);
+            }));
+
             if( mycon ){
                 mycon.end();
             }
         })(discordNewusers);
-        const result_test = await Promise.all([wotbDaily, thunderDaily, discordDaily]);
+        
+        
+        
+        /**
+         * ※データベースroleを適切なものにする
+         */
     }
     /**
      * 
