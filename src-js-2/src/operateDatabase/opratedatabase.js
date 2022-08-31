@@ -317,11 +317,15 @@ class OperationDatabase{
 
             /**
             * ※データベースのdiscord ignを最新にする〇
-            * ※WTとWotbをDiscordと紐づける
+            * ※WTとWotbをDiscordと紐づける〇
             */
             //1日ここから
             await Promise.all(newusers.map(async(user)=>{
-                await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}' WHERE d_user_id = ${BigInt(user.id)}`);
+                const [thunder, gomi4] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_ign = '${user.ign}'`);
+                const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_ign = '${user.ign}'`);
+                user.wotbClass = await this.#dbToUsers(wotb)[0];
+                user.thunderClass = await this.#dbToUsers(thunder)[0];
+                await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id} WHERE d_user_id = ${BigInt(user.id)}`);
             }));
 
             if( mycon ){
