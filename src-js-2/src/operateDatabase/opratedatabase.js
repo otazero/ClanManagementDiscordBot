@@ -245,6 +245,8 @@ class OperationDatabase{
                         user.username = older.d_name;
                         user.nick = older.d_nick;
                         user.isflag = false;
+                        user.subign = older.d_subign;
+                        user.upignFlag = older.d_upign_flag;
                         if(older.w_user_id){
                             const [wotbUsers, gomi1] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${older.w_user_id}`);
                             const wotbUser = await this.#dbToUsers(wotbUsers);
@@ -321,10 +323,17 @@ class OperationDatabase{
             */
             //1日ここから
             await Promise.all(newusers.map(async(user)=>{
+                const [sub, gomi6] = await mycon.query(`SELECT d_subign, d_upign_flag FROM d_discord_members WHERE w_ign = '${user.id}'`);
                 const [thunder, gomi4] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_ign = '${user.ign}'`);
-                const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_ign = '${user.ign}'`);
-                user.wotbClass = await this.#dbToUsers(wotb)[0];
-                user.thunderClass = await this.#dbToUsers(thunder)[0];
+                const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_ign = '${sub.d_upign_flag?sub.d_subign:user.ign}'`);
+                
+                if(wotb.length){
+                    user.wotbClass = await this.#dbToUsers(wotb)[0];
+                }
+                if(thunder.length){
+                    user.thunderClass = await this.#dbToUsers(thunder)[0];
+                }
+                
                 await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id} WHERE d_user_id = ${BigInt(user.id)}`);
             }));
 
@@ -367,6 +376,8 @@ class OperationDatabase{
                     }
                     user.username = dbuser.d_name;
                     user.nick = dbuser.d_nick;
+                    user.subign = dbuser.d_subign;
+                    user.upignFlag = dbuser.d_upign_flag;
                     if(dbuser.w_user_id){
                         const [wotbUsers, gomi1] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${dbuser.w_user_id}`);
                         const wotbUser = await this.#dbToUsers(wotbUsers);
