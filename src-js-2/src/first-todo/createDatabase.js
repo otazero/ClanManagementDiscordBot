@@ -178,6 +178,8 @@ class CreateDataBase{
                     d_left_at DATETIME,
                     d_is_flag BOOLEAN DEFAULT true NOT NULL,
                     d_sub_id BIGINT UNIQUE,
+                    d_subign varchar(32),
+                    d_upign_flag BOOLEAN DEFAULT false NOT NULL,
                     
                     INDEX wd_index(w_user_id),
                     INDEX td_index(t_user_id),

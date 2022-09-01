@@ -102,6 +102,8 @@ class DiscordUser extends User {
         this.nick = null;
         /** @type {?DiscordUser}  サブ垢のUserclass*/
         this.subClass = null;
+        this.subign = null;
+        this.upignFlag = false;
     }
     /**
      * createdbの戻り値をもとに行う
