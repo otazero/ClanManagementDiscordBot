@@ -136,6 +136,8 @@ class CreateDataBase{
                     w_enter_at DATETIME,
                     w_left_at DATETIME,
                     w_is_flag BOOLEAN DEFAULT true NOT NULL,
+                    w_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    w_updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX rw_index(r_id),
                     CONSTRAINT fk_rw_id
                         FOREIGN KEY (r_id) 
@@ -155,6 +157,8 @@ class CreateDataBase{
                     t_left_at DATE,
                     t_is_flag BOOLEAN DEFAULT true NOT NULL,
                     t_all_active INT DEFAULT 0 NOT NULL,
+                    t_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    t_updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX rt_index(r_id),
                     CONSTRAINT fk_rt_id_
                         FOREIGN KEY (r_id) 
@@ -180,6 +184,8 @@ class CreateDataBase{
                     d_sub_id BIGINT UNIQUE,
                     d_subign varchar(32),
                     d_upign_flag BOOLEAN DEFAULT false NOT NULL,
+                    d_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    d_updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     
                     INDEX wd_index(w_user_id),
                     INDEX td_index(t_user_id),
