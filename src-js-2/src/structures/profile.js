@@ -20,7 +20,7 @@ class User {
         /** @type {?String}  退室日*/
         this.left_at = null;
         /** @type {Boolean}  在籍フラグ。Trueでいる。*/
-        this.isflag = true;
+        this.isflag = false;
     }
     /**
      * @param {string[]|number[]} roleinfo APIの結果をリストで渡す

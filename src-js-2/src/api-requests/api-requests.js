@@ -2,7 +2,7 @@ const request = require('request');
 const fs = require('fs');
 const ini = require('ini');
 
-const {WotbUser, DiscordUser} = require('../structures/profile');
+const {WotbUser, ThunderUser, DiscordUser} = require('../structures/profile');
 
 const {WhatYourIgn} = require('../what-your-Info/whatYourInfo');
 
@@ -77,9 +77,11 @@ class Jsontouserclass{
             user.setrole = member.roles;
             user.setEnter = member.joined_at;
             user.username = member.user.username;
-            user.wotbClass = null;
-            user.thunderClass = null;
+            user.wotbClass = new WotbUser();
+            user.thunderClass = new ThunderUser();
+            user.subClass = new DiscordUser();
             user.nick = member.nick;
+            user.isflag = true;
             return user;
         });
         return users;
@@ -95,6 +97,7 @@ class Jsontouserclass{
                 user.ign = member.account_name;
                 user.setrole = [member.role];
                 user.setEnter = member.joined_at;
+                user.isflag = true;
                 result.push(user);
             });
             return result;
