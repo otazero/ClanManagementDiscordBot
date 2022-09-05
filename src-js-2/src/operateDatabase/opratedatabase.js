@@ -100,11 +100,6 @@ class OperationDatabase{
                     const [result, gomi] = await mycon.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at, w_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE w_is_flag = new.w_is_flag`);
                 })(mycon);
             }
-            //デバグ
-            console.log("B退室");
-            console.log(lefters);
-            console.log("B入室");
-            console.log(enters);
             if( mycon ){
                 mycon.end();
             }
@@ -187,16 +182,6 @@ class OperationDatabase{
                 }));       
             }
             
-            //デバグ
-            console.log("\n\n\n");
-            console.log("TH退室", lefters.length);
-            lefters.forEach(m => {
-                console.log(m.id, m.ign, m.nowactive, m.allactive);
-            });
-            console.log("TH入室", enters.length);
-            enters.forEach(m => {
-                console.log(m.id, m.ign, m.nowactive, m.allactive);
-            });
             
             if( mycon ){
                 mycon.end();
@@ -305,17 +290,7 @@ class OperationDatabase{
                 const q_text = text.slice(0, -1);
                 const [result, gomi] = await mycon.query(`INSERT INTO d_discord_members(d_user_id, d_name, d_ign, d_nick, r_id, d_enter_at, d_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE d_is_flag = new.d_is_flag`);
             }
-            console.log("\n\n\n");
-            console.log("D退室");
-            console.log(lefters);
-            /*
-            lefters.forEach(left => {
-                console.log(left.id, left.username, left.nick, left.ign,left.role);
-            });*/
-            console.log("D入室");
-            enters.forEach(e =>{
-                console.log(e.id, e.username);
-            });
+            
 
             /**
             * ※データベースのdiscord ignを最新にする〇
@@ -339,17 +314,16 @@ class OperationDatabase{
                     let toChange = {user:user, change:"no"};
                     if(user.wotbClass.isflag || user.thunderClass.isflag){
                         if((user.role.main.id == 3 || user.role.main.id == 5) || user.role.main.id == 6){
-                            console.log("元老→クラメン");
                             toChange.change = "toClanmem";
+                            return toChange;
                         }
                     }
                     else{
                         if(user.role.main.id == 4){
-                            console.log("クラメン→元老");
                             toChange.change = "toGenro";
+                            return toChange;
                         }
                     }
-                    return toChange;
                 })(user);
                 
                 await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id} WHERE d_user_id = ${BigInt(user.id)}`);
@@ -361,12 +335,12 @@ class OperationDatabase{
             if( mycon ){
                 mycon.end();
             }
-            return {lefters:lefters, enters:enters, roleChange:toChanges};
+            return {lefters:lefters, enters:enters, roleChange:toChanges.filter(Boolean)};
         })(discordNewusers);
         
         const dailyDiscord = await discordDaily;
         
-        return dailyWotb, dailyThunder, dailyDiscord;
+        return [dailyWotb, dailyThunder, dailyDiscord];
     }
     /**
      * 
