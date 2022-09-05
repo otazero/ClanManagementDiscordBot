@@ -315,18 +315,20 @@ class OperationDatabase{
                     if(user.wotbClass.isflag || user.thunderClass.isflag){
                         if((user.role.main.id == 3 || user.role.main.id == 5) || user.role.main.id == 6){
                             toChange.change = "toClanmem";
+                            user.role.main.id = 4;
                             return toChange;
                         }
                     }
                     else{
                         if(user.role.main.id == 4){
                             toChange.change = "toGenro";
+                            user.role.main.id = 3;
                             return toChange;
                         }
                     }
                 })(user);
                 
-                await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id} WHERE d_user_id = ${BigInt(user.id)}`);
+                await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id}, r_id = ${user.role.main.id} WHERE d_user_id = ${BigInt(user.id)}`);
                 return rightDiscordRole;
             }));
             
