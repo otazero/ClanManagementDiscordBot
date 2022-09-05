@@ -70,9 +70,9 @@ class shapDatetime{
                 date.year += dt[i];
             }
         }
-        this.year = date.year;
-        this.month = date.month;
-        this.day = date.day;
+        this.year = ''+date.year;
+        this.month = ''+date.month;
+        this.day = ''+date.day;
         this.hour = '00';
         this.min = '00';
         this.sec = '00';
@@ -80,11 +80,11 @@ class shapDatetime{
     #iso8061(dt){
         const datepack = dt.split(/-|:|T|\+/);
         const sec = Math.floor(Number(datepack[5]));
-        this.year = datepack[0];
-        this.month = datepack[1];
-        this.day = datepack[2];
-        this.hour = datepack[3];
-        this.min = datepack[4];
+        this.year = ''+datepack[0];
+        this.month = ''+datepack[1];
+        this.day = ''+datepack[2];
+        this.hour = ''+datepack[3];
+        this.min = ''+datepack[4];
         this.sec = ''+((sec<10)?'0'+sec:''+sec);
 
     }
@@ -112,12 +112,12 @@ class shapDatetime{
         if (sec   < 10){
             sec   = '0' + sec;
         }
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.hour = hour;
-        this.min = min;
-        this.sec = sec;
+        this.year = ''+year;
+        this.month = ''+month;
+        this.day = ''+day;
+        this.hour = ''+hour;
+        this.min = ''+min;
+        this.sec = ''+sec;
     }
     #hutaketa(num){
         return (num>9)?''+num:'0'+num;

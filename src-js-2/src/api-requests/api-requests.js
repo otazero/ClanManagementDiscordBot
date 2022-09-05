@@ -2,7 +2,7 @@ const request = require('request');
 const fs = require('fs');
 const ini = require('ini');
 
-const {WotbUser, DiscordUser} = require('../structures/profile');
+const {WotbUser, ThunderUser, DiscordUser} = require('../structures/profile');
 
 const {WhatYourIgn} = require('../what-your-Info/whatYourInfo');
 
@@ -72,30 +72,36 @@ class Jsontouserclass{
     static discord(data){
         const users = data.filter(member => !(member.user.bot === true)).map(member => {
             let user = new DiscordUser();
-            user.id = Number(member.user.id);
+            user.id = member.user.id;
             user.ign = WhatYourIgn.getign(member.user.username, member.nick);
             user.setrole = member.roles;
             user.setEnter = member.joined_at;
             user.username = member.user.username;
-            user.wotbid = null;
-            user.thunderid = null;
+            user.wotbClass = new WotbUser();
+            user.thunderClass = new ThunderUser();
+            user.subClass = new DiscordUser();
             user.nick = member.nick;
+            user.isflag = true;
             return user;
         });
         return users;
     }
     /** @returns {WotbUser[]}  */
     static wotb(data){
-        let users = [];
-        Object.keys(data).forEach((id) => {
-            const member = data[''+id];
-            let user = new WotbUser();
-            user.id = Number(id);
-            user.ign = member.account_name;
-            user.setrole = [member.role];
-            user.setEnter = member.joined_at;
-            users.push(user);
-        });
+        const users = ((data)=>{
+            let result = [];
+            Object.keys(data).forEach((id) => {
+                const member = data[''+id];
+                let user = new WotbUser();
+                user.id = Number(id);
+                user.ign = member.account_name;
+                user.setrole = [member.role];
+                user.setEnter = member.joined_at;
+                user.isflag = true;
+                result.push(user);
+            });
+            return result;
+        })(data);
         return users;
     }
 }

@@ -15,6 +15,9 @@ const db_setting = {
     user: config.Database.user,
     password: config.Database.password,
     database: 'clandb',
+
+    supportBigNumbers: true, // BigNumberサポート有効化
+    bigNumberStrings: true, // BigNumberを文字列として扱う
 };
 
 class CreateDataBase{
@@ -59,7 +62,7 @@ class CreateDataBase{
         let insert = "";
         const length = discordusers.length - 1;
         discordusers.forEach((body, index) => {
-            insert += `(${body.id}, '${body.username}', ${body.wotbid}, ${body.thunderid}, ${body.role.main.id}, '${body.nick}', '${body.ign}', '${body.enter_at.getDateTime}')`;
+            insert += `(${body.id}, '${body.username}', ${body.wotbClass.id}, ${body.thunderClass.id}, ${body.role.main.id}, '${body.nick}', '${body.ign}', '${body.enter_at.getDateTime}')`;
             if(index<length){
                 insert += ",";
             }
@@ -98,7 +101,7 @@ class CreateDataBase{
         let insert = "";
         const length = roleData.length - 1;
         roleData.forEach((body, index) => {
-            insert += `(${body.id}, '${body.name}', ${body.discordid})`;
+            insert += `(${body.id}, '${body.name}', '${body.discordid}')`;
             if(index<length){
                 insert += ",";
             }
@@ -120,7 +123,7 @@ class CreateDataBase{
                 (
                     r_id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
                     r_name VARCHAR(20) UNIQUE NOT NULL,
-                    r_dis_id BIGINT
+                    r_dis_id VARCHAR(18)
                 )
             `),
             /* wotbメンバーテーブル */
@@ -131,7 +134,7 @@ class CreateDataBase{
                     w_ign VARCHAR(24) UNIQUE NOT NULL,
                     r_id TINYINT UNSIGNED NOT NULL,
                     w_enter_at DATETIME,
-                    w_left_at DATE,
+                    w_left_at DATETIME,
                     w_is_flag BOOLEAN DEFAULT true NOT NULL,
                     INDEX rw_index(r_id),
                     CONSTRAINT fk_rw_id
@@ -145,7 +148,7 @@ class CreateDataBase{
             con.query(`
                 CREATE TABLE IF NOT EXISTS t_wt_members
                 (
-                    t_user_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+                    t_user_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
                     t_ign VARCHAR(16) UNIQUE NOT NULL,
                     r_id TINYINT UNSIGNED NOT NULL,
                     t_enter_at DATE,
@@ -175,6 +178,8 @@ class CreateDataBase{
                     d_left_at DATETIME,
                     d_is_flag BOOLEAN DEFAULT true NOT NULL,
                     d_sub_id BIGINT UNIQUE,
+                    d_subign varchar(32),
+                    d_upign_flag BOOLEAN DEFAULT false NOT NULL,
                     
                     INDEX wd_index(w_user_id),
                     INDEX td_index(t_user_id),
@@ -200,7 +205,8 @@ class CreateDataBase{
             con.query(`
                 CREATE TABLE IF NOT EXISTS wt_actives
                 (
-                    t_user_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
+                    wt_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+                    t_user_id INT UNSIGNED NOT NULL,
                     wt_active SMALLINT NOT NULL,
                     wt_created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     INDEX wta_index_index(t_user_id),
@@ -208,7 +214,6 @@ class CreateDataBase{
                         FOREIGN KEY (t_user_id) 
                             REFERENCES t_wt_members (t_user_id)
                             ON DELETE RESTRICT ON UPDATE CASCADE
-
                 )
             `)
         ]);

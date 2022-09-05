@@ -21,7 +21,9 @@ class Scrape{
                 const i = Math.trunc(index / 6) - 1;
                 switch (index % 6) {
                     case 0:
-                        users.push(new ThunderUser);
+                        const temp = new ThunderUser();
+                        temp.isflag = true;
+                        users.push(temp);
                         break;
                     case 1:
                         //console.log(value.children[1].attribs.href.replace('en/community/userinfo/?nick=', ''));
