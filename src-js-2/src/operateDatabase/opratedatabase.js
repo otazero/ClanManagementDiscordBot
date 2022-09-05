@@ -203,7 +203,7 @@ class OperationDatabase{
             }
             return {lefters:lefters, enters:enters};
         })(thunderNewusers);
-        const result_test = await Promise.all([wotbDaily, thunderDaily]);
+        const [dailyWotb, dailyThunder] = await Promise.all([wotbDaily, thunderDaily]);
         /** Discord **/
         /**
          * ※Discord入室者の把握
@@ -321,7 +321,7 @@ class OperationDatabase{
             * ※データベースのdiscord ignを最新にする〇
             * ※WTとWotbをDiscordと紐づける〇
             */
-            await Promise.all(newusers.map(async(user)=>{
+            const toChanges = await Promise.all(newusers.map(async(user)=>{
                 const [sub, gomi6] = await mycon.query(`SELECT d_subign, d_upign_flag FROM d_discord_members WHERE d_ign = '${user.id}'`);
                 const [thunder, gomi4] = await mycon.query(`SELECT * FROM t_wt_members NATURAL INNER JOIN r_roles WHERE t_ign = '${user.ign}'`);
                 const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members NATURAL INNER JOIN r_roles WHERE w_ign = '${sub.d_upign_flag?sub.d_subign:user.ign}'`);
@@ -336,33 +336,24 @@ class OperationDatabase{
                 }
                 // 適性ロールに
                 const rightDiscordRole = ((user)=>{
-                    console.log("discord-name", user.ign);
-                    /*
-                    console.log("discord-discord", user.role.main.name);
-                    */
-                    console.log("discord-wotb", user.wotbClass.role?user.wotbClass.isflag:null);
-                    console.log("discord-thunder", user.thunderClass.role?user.thunderClass.isflag:null);
-                    
-                    // クラメン→元老
-                    
+                    let toChange = {user:user, change:"no"};
                     if(user.wotbClass.isflag || user.thunderClass.isflag){
-                        console.log(user.wotbClass.isflag);
-                        console.log(user.thunderClass.isflag);
-                        console.log(user.wotbClass.isflag || user.thunderClass.isflag);
                         if((user.role.main.id == 3 || user.role.main.id == 5) || user.role.main.id == 6){
                             console.log("元老→クラメン");
+                            toChange.change = "toClanmem";
                         }
                     }
                     else{
                         if(user.role.main.id == 4){
                             console.log("クラメン→元老");
+                            toChange.change = "toGenro";
                         }
                     }
-                    console.log("\n\n");
-                    return
-                })(user)
+                    return toChange;
+                })(user);
                 
                 await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id} WHERE d_user_id = ${BigInt(user.id)}`);
+                return rightDiscordRole;
             }));
             
             
@@ -370,13 +361,12 @@ class OperationDatabase{
             if( mycon ){
                 mycon.end();
             }
+            return {lefters:lefters, enters:enters, roleChange:toChanges};
         })(discordNewusers);
         
+        const dailyDiscord = await discordDaily;
         
-        
-        /**
-         * ※データベースroleを適切なものにする
-         */
+        return dailyWotb, dailyThunder, dailyDiscord;
     }
     /**
      * 
