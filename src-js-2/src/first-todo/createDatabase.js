@@ -174,7 +174,7 @@ class CreateDataBase{
                     d_user_id BIGINT NOT NULL PRIMARY KEY,
                     d_name VARCHAR(32) NOT NULL,
                     w_user_id INT UNSIGNED,
-                    t_user_id SMALLINT UNSIGNED,
+                    t_user_id INT UNSIGNED,
                     r_id TINYINT UNSIGNED NOT NULL,
                     d_nick VARCHAR(32),
                     d_ign VARCHAR(32) NOT NULL,
