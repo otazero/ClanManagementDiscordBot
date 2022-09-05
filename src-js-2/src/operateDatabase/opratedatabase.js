@@ -302,7 +302,7 @@ class OperationDatabase{
                 enters.forEach(enter => {
                     text += `(${BigInt(enter.id)}, '${enter.username}', '${enter.ign}', '${enter.nick}', ${enter.role.main.id}, '${enter.enter_at.getDateTime}', true),`;
                 });
-                const q_text = text.slice(0, -1);;
+                const q_text = text.slice(0, -1);
                 const [result, gomi] = await mycon.query(`INSERT INTO d_discord_members(d_user_id, d_name, d_ign, d_nick, r_id, d_enter_at, d_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE d_is_flag = new.d_is_flag`);
             }
             console.log("\n\n\n");
@@ -321,21 +321,51 @@ class OperationDatabase{
             * ※データベースのdiscord ignを最新にする〇
             * ※WTとWotbをDiscordと紐づける〇
             */
-            //1日ここから
             await Promise.all(newusers.map(async(user)=>{
-                const [sub, gomi6] = await mycon.query(`SELECT d_subign, d_upign_flag FROM d_discord_members WHERE w_ign = '${user.id}'`);
-                const [thunder, gomi4] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_ign = '${user.ign}'`);
-                const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_ign = '${sub.d_upign_flag?sub.d_subign:user.ign}'`);
+                const [sub, gomi6] = await mycon.query(`SELECT d_subign, d_upign_flag FROM d_discord_members WHERE d_ign = '${user.id}'`);
+                const [thunder, gomi4] = await mycon.query(`SELECT * FROM t_wt_members NATURAL INNER JOIN r_roles WHERE t_ign = '${user.ign}'`);
+                const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members NATURAL INNER JOIN r_roles WHERE w_ign = '${sub.d_upign_flag?sub.d_subign:user.ign}'`);
                 
                 if(wotb.length){
-                    user.wotbClass = await this.#dbToUsers(wotb)[0];
+                    const temp = user.wotbClass = await this.#dbToUsers(wotb);
+                    user.wotbClass = temp[0];
                 }
                 if(thunder.length){
-                    user.thunderClass = await this.#dbToUsers(thunder)[0];
+                    const temp = await this.#dbToUsers(thunder);
+                    user.thunderClass = temp[0];
                 }
+                // 適性ロールに
+                const rightDiscordRole = ((user)=>{
+                    console.log("discord-name", user.ign);
+                    /*
+                    console.log("discord-discord", user.role.main.name);
+                    */
+                    console.log("discord-wotb", user.wotbClass.role?user.wotbClass.isflag:null);
+                    console.log("discord-thunder", user.thunderClass.role?user.thunderClass.isflag:null);
+                    
+                    // クラメン→元老
+                    
+                    if(user.wotbClass.isflag || user.thunderClass.isflag){
+                        console.log(user.wotbClass.isflag);
+                        console.log(user.thunderClass.isflag);
+                        console.log(user.wotbClass.isflag || user.thunderClass.isflag);
+                        if((user.role.main.id == 3 || user.role.main.id == 5) || user.role.main.id == 6){
+                            console.log("元老→クラメン");
+                        }
+                    }
+                    else{
+                        if(user.role.main.id == 4){
+                            console.log("クラメン→元老");
+                        }
+                    }
+                    console.log("\n\n");
+                    return
+                })(user)
                 
                 await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id} WHERE d_user_id = ${BigInt(user.id)}`);
             }));
+            
+            
 
             if( mycon ){
                 mycon.end();
@@ -378,6 +408,9 @@ class OperationDatabase{
                     user.nick = dbuser.d_nick;
                     user.subign = dbuser.d_subign;
                     user.upignFlag = dbuser.d_upign_flag;
+                    user.wotbClass = new WotbUser();
+                    user.thunderClass = new ThunderUser();
+                    user.subClass = new DiscordUser();
                     if(dbuser.w_user_id){
                         const [wotbUsers, gomi1] = await mycon.query(`SELECT * FROM w_wotb_members WHERE w_user_id = ${dbuser.w_user_id}`);
                         const wotbUser = await this.#dbToUsers(wotbUsers);
@@ -401,7 +434,7 @@ class OperationDatabase{
                 }
                 return classUsers;
             })(dbusers);
-            return discordClasses;
+            return await discordClasses;
         }
         else if(Object.keys(dbusers[0]).includes('w_user_id')){
             const wotbClasses = (async(dbusers)=>{
@@ -428,7 +461,7 @@ class OperationDatabase{
                 }
                 return classUsers;
             })(dbusers);
-            return wotbClasses;
+            return await wotbClasses;
         }
         else if(Object.keys(dbusers[0]).includes('t_user_id')){
             const thunderClasses = (async(dbusers)=>{
@@ -458,7 +491,8 @@ class OperationDatabase{
                 }
                 return classUsers;
             })(dbusers);
-            return thunderClasses;
+            
+            return await thunderClasses;
         }
         else{
             console.log("bak-ka");
