@@ -19,7 +19,7 @@ client.once('ready', async() => {
     console.log('接続しました！', new Date());
 });
 
-client.on('ready', () => {
+client.on('ready', async() => {
     cron.schedule('0 0 3 * * *', async() => {
         // TODO: スクレイピング→入退室の確認など
         console.log("3時だよ!全員集合！");
