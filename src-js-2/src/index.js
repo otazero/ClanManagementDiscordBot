@@ -72,7 +72,32 @@ client.on('ready', async() => {
                     .setColor('#800080')
                     .setTimestamp();
         client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
-        client.channels.cache.get('967753820052533248').send(daily.roleChangeText);
+        client.channels.cache.get('1016533368604725390').send(daily.roleChangeText);
+        // クランメンバー→元老
+        const discordMemberInfo = client.guilds.cache.get(`${config.DiscordConfig.guildid}`);
+        daily.roleChangers.forEach(obj => {
+            if(obj.change == "toClanmem"){
+                discordMemberInfo.members.fetch(obj.user.id).then((member) => {
+                    // クラメンロール付与
+                    member.roles.add(`558947013744525313`);
+                    // 元老ロール剥奪
+                    member.roles.remove(`483571690429743115`);
+                });
+            }
+            else if(obj.change == "toGenro"){
+                discordMemberInfo.members.fetch(obj.user.id).then((member) => {
+                    // 元老ロール付与
+                    member.roles.add(`483571690429743115`);
+                    // クランメンバーロール剥奪
+                    member.roles.remove(`558947013744525313`);
+                });
+            }
+            else{
+                console.log("どこも通過しなかった");
+            }
+        });
+            
+        
 
         //const now = new Date();
         //const pass = (now.getTime() - start.getTime()) / 1000 / 60;
