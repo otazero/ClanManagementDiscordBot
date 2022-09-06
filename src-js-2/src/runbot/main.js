@@ -50,6 +50,7 @@ class Daily{
         console.log("Discord-役割変更");
         console.log(dailyDiscord.roleChange);
         console.log("\n\n\n");
+        
         this.wotbLefters = dailyWotb.lefters;
         this.wotbEnters = dailyWotb.enters;
         this.thunderLefters = dailyThunder.lefters;

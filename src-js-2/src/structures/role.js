@@ -35,5 +35,6 @@ class role{
 
 
 module.exports = {
-    roles
+    roles,
+    role
 }
