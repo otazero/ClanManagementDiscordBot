@@ -97,7 +97,7 @@ class OperationDatabase{
                         text += `(${enter.id}, '${enter.ign}', ${enter.role.main.id}, '${enter.enter_at.getDateTime}', true),`;
                     });
                     const q_text = text.slice(0, -1);;
-                    const [result, gomi] = await mycon.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at, w_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE w_is_flag = new.w_is_flag`);
+                    const [result, gomi] = await mycon.query(`INSERT INTO w_wotb_members(w_user_id, w_ign, r_id, w_enter_at, w_is_flag) VALUES ${q_text} ON DUPLICATE KEY UPDATE w_is_flag = VALUES(w_is_flag)`);
                 })(mycon);
             }
             if( mycon ){
@@ -176,7 +176,7 @@ class OperationDatabase{
             //入室者に関するデータベース操作
             if(enters.length){
                 await Promise.all(enters.map(async(user) => {
-                    const [result, gomi] = await mycon.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_is_flag) VALUES ('${user.ign}', ${user.role.main.id}, '${user.enter_at.getDateTime}', true) AS new ON DUPLICATE KEY UPDATE t_is_flag = new.t_is_flag`);
+                    const [result, gomi] = await mycon.query(`INSERT INTO t_wt_members(t_ign, r_id, t_enter_at, t_is_flag) VALUES ('${user.ign}', ${user.role.main.id}, '${user.enter_at.getDateTime}', true) ON DUPLICATE KEY UPDATE t_is_flag = VALUES(t_is_flag)`);
                     user.id = result.insertId;
                     return 0;
                 }));       
@@ -288,7 +288,7 @@ class OperationDatabase{
                     text += `(${BigInt(enter.id)}, '${enter.username}', '${enter.ign}', '${enter.nick}', ${enter.role.main.id}, '${enter.enter_at.getDateTime}', true),`;
                 });
                 const q_text = text.slice(0, -1);
-                const [result, gomi] = await mycon.query(`INSERT INTO d_discord_members(d_user_id, d_name, d_ign, d_nick, r_id, d_enter_at, d_is_flag) VALUES ${q_text} AS new ON DUPLICATE KEY UPDATE d_is_flag = new.d_is_flag`);
+                const [result, gomi] = await mycon.query(`INSERT INTO d_discord_members(d_user_id, d_name, d_ign, d_nick, r_id, d_enter_at, d_is_flag) VALUES ${q_text} ON DUPLICATE KEY UPDATE d_is_flag = VALUES(d_is_flag)`);
             }
             
 
