@@ -72,7 +72,7 @@ client.on('ready', async() => {
                     .setColor('#800080')
                     .setTimestamp();
         client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
-        client.channels.cache.get('1016533368604725390').send(daily.roleChangeText);
+        
         // クランメンバー→元老
         const discordMemberInfo = client.guilds.cache.get(`${config.DiscordConfig.guildid}`);
         daily.roleChangers.forEach(obj => {
@@ -96,7 +96,8 @@ client.on('ready', async() => {
                 console.log("どこも通過しなかった");
             }
         });
-            
+        // テスト用ID
+        client.channels.cache.get('1016533368604725390').send(daily.roleChangeText);
         
 
         //const now = new Date();
