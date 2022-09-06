@@ -1,6 +1,9 @@
 const mysql = require("mysql2/promise");
 const {WotbUser, DiscordUser, ThunderUser} = require('../structures/profile');
 const {shapDatetime} = require('../change-datetime-type/toDatetime');
+const {role}= require('../structures/role.js');
+
+const roleData= require('../../template/roles.json');
 
 // 秘密ファイル
 const fs = require('fs');
@@ -300,7 +303,6 @@ class OperationDatabase{
                 const [sub, gomi6] = await mycon.query(`SELECT d_subign, d_upign_flag FROM d_discord_members WHERE d_ign = '${user.id}'`);
                 const [thunder, gomi4] = await mycon.query(`SELECT * FROM t_wt_members NATURAL INNER JOIN r_roles WHERE t_ign = '${user.ign}'`);
                 const [wotb, gomi5] = await mycon.query(`SELECT * FROM w_wotb_members NATURAL INNER JOIN r_roles WHERE w_ign = '${sub.d_upign_flag?sub.d_subign:user.ign}'`);
-                
                 if(wotb.length){
                     const temp = user.wotbClass = await this.#dbToUsers(wotb);
                     user.wotbClass = temp[0];
@@ -315,14 +317,14 @@ class OperationDatabase{
                     if(user.wotbClass.isflag || user.thunderClass.isflag){
                         if((user.role.main.id == 3 || user.role.main.id == 5) || user.role.main.id == 6){
                             toChange.change = "toClanmem";
-                            user.role.main.id = 4;
+                            user.role.main = new role(roleData[3]);
                             return toChange;
                         }
                     }
                     else{
                         if(user.role.main.id == 4){
                             toChange.change = "toGenro";
-                            user.role.main.id = 3;
+                            user.role.main = new role(roleData[2]);
                             return toChange;
                         }
                     }
