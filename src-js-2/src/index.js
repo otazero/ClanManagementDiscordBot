@@ -14,6 +14,15 @@ let config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
 const token = config.Credentials.token;
 
+/* ロールID */
+const clanMemberRole = "558947013744525313";
+const genroMemberRole = "483571690429743115";
+
+/* チャンネルID */
+const clanNewsCh = "819208111017295973";
+const changeRoleCallCh = "1016533368604725390";
+const testDropCh = "967753820052533248";
+
 'use strict';
 client.once('ready', async() => {
     console.log('接続しました！', new Date());
@@ -71,7 +80,7 @@ client.on('ready', async() => {
                         },)
                     .setColor('#800080')
                     .setTimestamp();
-        client.channels.cache.get('967753820052533248').send({ embeds: [embed] });
+        client.channels.cache.get(clanNewsCh).send({ embeds: [embed] });
         
         // クランメンバー→元老
         const discordMemberInfo = client.guilds.cache.get(`${config.DiscordConfig.guildid}`);
@@ -79,17 +88,17 @@ client.on('ready', async() => {
             if(obj.change == "toClanmem"){
                 discordMemberInfo.members.fetch(obj.user.id).then((member) => {
                     // クラメンロール付与
-                    member.roles.add(`558947013744525313`);
+                    member.roles.add(clanMemberRole);
                     // 元老ロール剥奪
-                    member.roles.remove(`483571690429743115`);
+                    member.roles.remove(genroMemberRole);
                 });
             }
             else if(obj.change == "toGenro"){
                 discordMemberInfo.members.fetch(obj.user.id).then((member) => {
                     // 元老ロール付与
-                    member.roles.add(`483571690429743115`);
+                    member.roles.add(genroMemberRole);
                     // クランメンバーロール剥奪
-                    member.roles.remove(`558947013744525313`);
+                    member.roles.remove(clanMemberRole);
                 });
             }
             else{
@@ -97,7 +106,7 @@ client.on('ready', async() => {
             }
         });
         // テスト用ID
-        client.channels.cache.get('1016533368604725390').send(daily.roleChangeText);
+        client.channels.cache.get(changeRoleCallCh).send(daily.roleChangeText);
         
 
         //const now = new Date();
