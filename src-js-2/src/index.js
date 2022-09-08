@@ -80,6 +80,7 @@ client.on('ready', async() => {
                         },)
                     .setColor('#800080')
                     .setTimestamp();
+
         client.channels.cache.get(clanNewsCh).send({ embeds: [embed] });
         
         // クランメンバー→元老
@@ -107,6 +108,7 @@ client.on('ready', async() => {
         });
         // テスト用ID
         client.channels.cache.get(changeRoleCallCh).send(daily.roleChangeText);
+
         
 
         //const now = new Date();
