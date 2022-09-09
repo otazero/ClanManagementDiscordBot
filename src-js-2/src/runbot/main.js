@@ -1,17 +1,7 @@
 const {IntegrationApiRequest} = require('../api-requests/api-requests');
 const {OperationDatabase} = require('../operateDatabase/opratedatabase');
 
-/**
- * 非アクティブ且つDIscord未参加抽出 総アクティブに加算+アクティブテーブルにinsert
- */
-class Monthly{
-    constructor(){
-        this.#main();
-    }
-    #main(){
-        
-    }
-}
+
 
 /**
  * 入退室者の更新
@@ -113,6 +103,24 @@ class Daily{
 
     
 }
+
+/**
+ * 非アクティブ且つDIscord未参加抽出 総アクティブに加算+アクティブテーブルにinsert
+ */
+
+/**
+ * アクテビティの更新
+ */
+class Monthly{
+    constructor(){
+        IntegrationApiRequest.requestThunder().then((thunderUsers)=>{
+            console.log(thunderUsers);
+            OperationDatabase.Monthly(thunderUsers);
+        });
+    }
+}
+
+const t = new Monthly();
 
 module.exports = {
     Monthly,
