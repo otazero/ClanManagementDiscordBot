@@ -118,6 +118,13 @@ client.on('ready', async() => {
         scheduled: true,
         timezone: "Asia/Tokyo"
     });
+    // アクテビティ更新
+    cron.schedule('30 58 8 * * *', async() => {
+        
+    },{
+        scheduled: true,
+        timezone: "Asia/Tokyo"
+    });
 });
 
 client.on("messageCreate", (message) => {
