@@ -468,7 +468,32 @@ class OperationDatabase{
         }
         
     }
+    /**
+     * 
+     * @param {thunderUser} thunderUser 
+     */
+    static async Monthly(thunderUser){
+        let mycon = null;
+        try {
+            mycon = await mysql.createConnection(db_setting);
+        }catch(e){
+            console.log(e);
+        }
+        // 最期に追加されてから30日後か確かめる
+        const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE CURRENT_DATE() >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
+        if(Number(result[0].count_is)){
+            console.log("アクテビティ更新します");
+        }
+        else{
+            console.log("30日経ってないよ");
+        }
+        if( mycon ){
+            mycon.end();
+        }
+    }
 }
+
+//OperationDatabase.Monthly()
 
 module.exports = {
     OperationDatabase
