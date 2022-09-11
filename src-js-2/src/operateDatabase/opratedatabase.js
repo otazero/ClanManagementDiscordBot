@@ -480,13 +480,47 @@ class OperationDatabase{
             console.log(e);
         }
         // 最期に追加されてから30日後か確かめる
-        const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE CURRENT_DATE() >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
+        // const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE CURRENT_DATE() >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
+        const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE "2022-10-09" >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
+        if( mycon ){
+            mycon.end();
+        }
         if(Number(result[0].count_is)){
             console.log("アクテビティ更新します");
+            this.#UpdateActivity(thunderUser);
         }
         else{
             console.log("30日経ってないよ");
         }
+    }
+
+    static async #UpdateActivity(thunderUser){
+        let mycon = null;
+        try {
+            mycon = await mysql.createConnection(db_setting);
+        }catch(e){
+            console.log(e);
+        }
+        const [dbThunder, gomi] = await mycon.query(`SELECT * FROM t_wt_members`);
+        const thunder = await this.#dbToUsers(dbThunder);
+        const q_text = ((thunderUser, thunder)=>{
+            let text = "";
+            thunderUser.forEach((user)=>{
+                thunder.forEach((tuser)=>{
+                    if(tuser.ign === user.ign){
+                        user.id = tuser.id;
+                        text += `(${user.id}, ${user.nowactive}), `;
+
+                        user.allactive = tuser.allactive + user.nowactive;
+                    }
+                });
+            });
+            return text.slice(0, -2);
+        })(thunderUser, thunder);
+        const [result1, gomi1] = await mycon.query(`INSERT INTO wt_actives(t_user_id, wt_active) VALUES ${q_text}`);
+        await Promise.all(thunderUser.map(async(user)=>{
+            await mycon.query(`UPDATE t_wt_members SET t_all_active = ${user.allactive} WHERE t_user_id = ${user.id}`);
+        }));
         if( mycon ){
             mycon.end();
         }

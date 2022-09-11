@@ -114,7 +114,6 @@ class Daily{
 class Monthly{
     constructor(){
         IntegrationApiRequest.requestThunder().then((thunderUsers)=>{
-            console.log(thunderUsers);
             OperationDatabase.Monthly(thunderUsers);
         });
     }
