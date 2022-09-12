@@ -80,6 +80,7 @@ class ThunderUser extends User {
      */
     set setActivestory(activities){
         this.activestory = activities.map((act) => {
+            this.allactive += act.wt_active;
             return new Activestory(act);
         });
     }

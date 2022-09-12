@@ -1,5 +1,5 @@
 const { Client , Intents, MessageEmbed, Permissions} = require('discord.js');
-const {Daily} = require(`./runbot/main.js`);
+const {Daily, Monthly} = require(`./runbot/main.js`);
 
 const client = new Client({
     intents: Object.values(Intents.FLAGS)
@@ -10,18 +10,21 @@ const cron = require('node-cron');
 const fs = require('fs');
 const ini = require('ini');
 
-let config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
+const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
 const token = config.Credentials.token;
 
 /* ロールID */
 const clanMemberRole = "558947013744525313";
 const genroMemberRole = "483571690429743115";
+const botRole = "558945569624817684";
+const thunderRole = "746933519518924910";
 
 /* チャンネルID */
 const clanNewsCh = "819208111017295973";
 const changeRoleCallCh = "1016533368604725390";
 const testDropCh = "967753820052533248";
+const callCenterCh = "747434239456313425";
 
 'use strict';
 client.once('ready', async() => {
@@ -108,12 +111,16 @@ client.on('ready', async() => {
         });
         // テスト用ID
         client.channels.cache.get(changeRoleCallCh).send(daily.roleChangeText);
-
-        
-
-        //const now = new Date();
-        //const pass = (now.getTime() - start.getTime()) / 1000 / 60;
-        //client.channels.cache.get('967753820052533248').send(`起動後${Math.round(pass)}分経過`);
+    },{
+        scheduled: true,
+        timezone: "Asia/Tokyo"
+    });
+    // アクテビティ更新
+    cron.schedule('30 58 8 * * *', async() => {
+    // cron.schedule('30 09 19 * * *', async() => {
+        const mom = new Monthly();
+        await mom.main();
+        sendKickCall(mom.kickMemText);
     },{
         scheduled: true,
         timezone: "Asia/Tokyo"
@@ -131,3 +138,18 @@ client.on("messageCreate", (message) => {
 
 client.login(token)
     .catch(console.error);
+
+function sendKickCall(text){
+    const embed = new MessageEmbed()
+                    .setTitle('__**:cherry_blossom:非アクティブメンバー粛清大会:cherry_blossom:**__')
+                    .setDescription('**非アクティブ且つDiscordクラン鯖未参加プレイヤー**を部隊よりキックします。\n候補者は下記の通りです。不具合により誤検出される場合があります。\n該当者は至急連絡されたし。')
+                    .addFields(
+                        {   
+                            name:`粛正対象者一覧`, 
+                            value:`${text}\n※非アクティブプレイヤー\n\tWarThunder部門入隊後${config.KickMember.progress}日が経過し直近30日のアクティビティが${config.KickMember.minactivity}以下の者`
+                        })
+                    .setColor('#00ff00')
+                    .setTimestamp();
+
+    client.channels.cache.get(callCenterCh).send({content: `<@&${thunderRole}>`, embeds: [embed] });
+}
