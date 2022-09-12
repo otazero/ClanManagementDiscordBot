@@ -53,49 +53,49 @@ class Daily{
     get wotbLeftersText(){
         let text = "";
         this.wotbLefters.forEach(user => {
-            text += `・${user.ign}\n`; 
+            text += `・${invalidSymbol(user.ign)}\n`; 
         });
         return text.length?text:"該当者なし";
     }
     get wotbEntersText(){
         let text = "";
         this.wotbEnters.forEach(user => {
-            text += `・${user.ign}\n`; 
+            text += `・${invalidSymbol(user.ign)}\n`; 
         });
         return text.length?text:"該当者なし";
     }
     get thunderLeftersText(){
         let text = "";
         this.thunderLefters.forEach(user => {
-            text += `・${user.ign}\n`; 
+            text += `・${invalidSymbol(user.ign)}\n`; 
         });
         return text.length?text:"該当者なし";
     }
     get thunderEntersText(){
         let text = "";
         this.thunderEnters.forEach(user => {
-            text += `・${user.ign}\n`; 
+            text += `・${invalidSymbol(user.ign)}\n`; 
         });
         return text.length?text:"該当者なし";
     }
     get discordLeftersText(){
         let text = "";
         this.discordLefters.forEach(user => {
-            text += `・${user.ign}\n`; 
+            text += `・${invalidSymbol(user.ign)}\n`; 
         });
         return text.length?text:"該当者なし";
     }
     get discordEntersText(){
         let text = "";
         this.discordEnters.forEach(user => {
-            text += `・${user.ign}\n`; 
+            text += `・${invalidSymbol(user.ign)}\n`; 
         });
         return text.length?text:"該当者なし";
     }
     get roleChangeText(){
         let text = "";
         this.roleChangers.forEach(user => {
-            text += `・${user.user.ign[0]=='_'?"\\":""}${user.user.ign}\t${user.change}\n`; 
+            text += `・${invalidSymbol(user.user.ign)}\t${user.change}\n`; 
         });
         return text.length?text:"該当者なし";
     }
@@ -113,13 +113,40 @@ class Daily{
  */
 class Monthly{
     constructor(){
-        IntegrationApiRequest.requestThunder().then((thunderUsers)=>{
-            OperationDatabase.Monthly(thunderUsers);
+        
+    }
+    async main(){
+        const [discordusers, thunderusers] = await Promise.all([IntegrationApiRequest.requestDiscord(), IntegrationApiRequest.requestThunder()]);
+        this.kickMem = await OperationDatabase.Monthly(thunderusers, discordusers);
+        //OperationDatabase.LetLeftUser(thunderUsers, discordUsers);
+    }
+    get kickMemText(){
+        let text = "";
+        this.kickMem.forEach((user)=>{
+            text += `> ・${invalidSymbol(user.ign)}\n`;
         });
+        return text.length?text:"該当者なし";
     }
 }
 
-const t = new Monthly();
+/**
+ * 記号を無効化する関数
+ * @param {*} text 
+ * @returns 
+ */
+function invalidSymbol(text){
+    const newtext = (text =>{
+        let neww = "";
+        for(let s of text){
+            if(s === "_" || s === "*" || s === "~"){
+                neww += "\\";
+            }
+            neww += s;
+        }
+        return neww;
+    })(text);
+    return newtext;
+}
 
 module.exports = {
     Monthly,
