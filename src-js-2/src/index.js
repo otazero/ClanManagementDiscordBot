@@ -26,8 +26,30 @@ const changeRoleCallCh = "1016533368604725390";
 const testDropCh = "967753820052533248";
 const callCenterCh = "747434239456313425";
 
+
+/* コマンドを読み込み */
+const commands = (()=>{
+    const commands = {};
+    const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const command = require(`./commands/${file}`);
+        commands[command.data.name] = command;
+    }
+    return commands;
+})();
+
+
 'use strict';
 client.once('ready', async() => {
+    /* コマンドを登録 */
+    const data = (()=>{
+        const data = [];
+        for (const commandName in commands) {
+            data.push(commands[commandName].data);
+        }
+        return data;
+    })();    
+    await client.application.commands.set(data, config.DiscordConfig.guildid);
     console.log('接続しました！', new Date());
 });
 
@@ -133,6 +155,22 @@ client.on("messageCreate", (message) => {
     }
     if (message.content === 'hihi') {
         console.log("hihi");
+    }
+});
+
+client.on("interactionCreate", async (interaction) => {
+    if (!interaction.isCommand()) {
+        return;
+    }
+    const command = commands[interaction.commandName];
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({
+            content: 'There was an error while executing this command!',
+            ephemeral: true,
+        })
     }
 });
 
