@@ -25,7 +25,7 @@ async function deleting(client, commandid, guildID) {
 
 const detectKickMember = {
     name: "kickmem",
-    description: "非アクティブプレイヤーを検出します",
+    description: "非アクティブプレイヤーを検出します。",
 };
 const setSub ={
     name: "setsub",
@@ -33,13 +33,43 @@ const setSub ={
     options: [
         {
             type: "USER",
-            name: "selectsub",
+            name: "subaccount",
             description: "サーバーに所属する本垢を選択してください。",
             required: true,
         }
     ]
 };
-const commands = [ping, detectKickMember, setSub];
+const profile = {
+    name: "profile",
+    description: "Botに登録されているプロフィールを表示します。",
+}
+
+const activity = {
+    name: "activity",
+    description: "WarThunderのアクティビティ履歴を表示します。",
+    options: [
+        {
+            type: "STRING",
+            name: "period",
+            description: "グラフに表示する期間を選択してください。(デフォルト:直近1年)",
+            choices: [
+            {
+                name: "直近1年",
+                value: "oneYear"
+            },
+            {
+                name: "直近半年",
+                value: "halfYear"
+            },
+            {
+                name: "全て",
+                value: "all"
+            }
+            ],
+        }
+    ]
+}
+const commands = [detectKickMember, setSub, profile, activity];
 const client = new Client({
     intents: 0,
 });
