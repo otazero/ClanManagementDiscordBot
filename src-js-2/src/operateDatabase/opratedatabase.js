@@ -470,9 +470,10 @@ class OperationDatabase{
     }
     /**
      * 
-     * @param {thunderUser} thunderUser 
+     * @param {*} thunderUser 
+     * @param {*} discordUser 
      */
-    static async Monthly(thunderUser){
+    static async Monthly(thunderUser, discordUser){
         let mycon = null;
         try {
             mycon = await mysql.createConnection(db_setting);
@@ -480,14 +481,16 @@ class OperationDatabase{
             console.log(e);
         }
         // 最期に追加されてから30日後か確かめる
-        // const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE CURRENT_DATE() >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
-        const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE "2022-10-09" >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
+        const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE CURRENT_DATE() >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
+        // const [result, gomi] = await mycon.query(`SELECT COUNT(*) AS count_is FROM wt_actives WHERE "2022-12-09" >= DATE(DATE_ADD((SELECT MAX(wt_created_at) FROM wt_actives), INTERVAL 30 DAY))`);
         if( mycon ){
             mycon.end();
         }
         if(Number(result[0].count_is)){
             console.log("アクテビティ更新します");
             this.#UpdateActivity(thunderUser);
+            console.log("キックメンバー抽出します");
+            return this.LetLeftUser(thunderUser, discordUser);
         }
         else{
             console.log("30日経ってないよ");
@@ -525,9 +528,32 @@ class OperationDatabase{
             mycon.end();
         }
     }
+
+    /**
+     * アクティビティキックメンバー算出
+     * @param {*} thunderUser 
+     * @param {*} discordUser 
+     * @returns {thunderClass[]} 
+     */
+    static async LetLeftUser(thunderUser, discordUser){
+        const now = new Date();
+        now.setDate(now.getDate() - Number(config.KickMember.progress));
+        const kickMembers = thunderUser.map((tuser)=>{
+            //　アクティビティがX以下の人を抽出
+            if(tuser.nowactive <= config.KickMember.minactivity){
+                // 入隊後N日数経過したフレンズのみ適用します
+                if(tuser.enter_at.getDateType < now){
+                    // Discordにもいません
+                    if(!(discordUser.some((duser)=>{return duser.ign===tuser.ign}))){
+                        return tuser;
+                    }
+                }
+            }
+        }).filter(Boolean);
+        return kickMembers;
+    }
 }
 
-//OperationDatabase.Monthly()
 
 module.exports = {
     OperationDatabase
