@@ -1,5 +1,6 @@
 const { Client , Intents, MessageEmbed, Permissions} = require('discord.js');
 const {Daily, Monthly} = require(`./runbot/main.js`);
+const {fixedTermReport, kickCall} = require(`./messages/message.js`);
 
 const client = new Client({
     intents: Object.values(Intents.FLAGS)
@@ -60,54 +61,9 @@ client.on('ready', async() => {
         const daily = new Daily();
         await daily.main();
         console.log(daily.test);
-        
-        const embed = new MessageEmbed()
-                    .setTitle('定時報告')
-                    .setDescription('本日も一日お疲れさまでした！定時報告です！')
-                    .addFields(
-                        {   
-                            name:`🌸ご入隊ありがとうございます🌸`, 
-                            value:`本日${daily.wotbEnters.length+daily.thunderEnters.length+daily.discordEnters.length}名の方が当クランに参加してくださいました！\nよろしくね～♪`
-                        }, 
-                        {
-                            name:'<:WT:747482544714547231>WarThunder部門', 
-                            value:`${daily.thunderEntersText}`,
-                            inline:true
-                        }, 
-                        {
-                            name:'<:Blitz:755234073957367938>World of Tanks Blitz部門', 
-                            value:`${daily.wotbEntersText}`, 
-                            inline:true
-                        },
-                        {
-                            name:'<:discord:1016346034760327218>クランサーバー部門', 
-                            value:`${daily.discordEntersText}`, 
-                            inline:true
-                        },
-                        {   
-                            name:`🎉お疲れさまでした🎉`, 
-                            value:`本日${daily.wotbLefters.length+daily.thunderLefters.length+daily.discordLefters.length}名の方が脱退しました。\n今までありがとうございました。`
-                        }, 
-                        {
-                            name:'<:WT:747482544714547231>WarThunder部門', 
-                            value:`${daily.thunderLeftersText}`,
-                            inline:true
-                        }, 
-                        {
-                            name:'<:Blitz:755234073957367938>World of Tanks Blitz部門', 
-                            value:`${daily.wotbLeftersText}`, 
-                            inline:true
-                        },
-                        {
-                            name:'<:discord:1016346034760327218>クランサーバー部門', 
-                            value:`${daily.discordLeftersText}`, 
-                            inline:true
-                        },)
-                    .setColor('#800080')
-                    .setTimestamp();
+        // 定時報告送信
+        await fixedTermReport(MessageEmbed, client, daily, clanNewsCh);
 
-        client.channels.cache.get(clanNewsCh).send({ embeds: [embed] });
-        
         // クランメンバー→元老
         const discordMemberInfo = client.guilds.cache.get(`${config.DiscordConfig.guildid}`);
         daily.roleChangers.forEach(obj => {
@@ -139,10 +95,10 @@ client.on('ready', async() => {
     });
     // アクテビティ更新
     cron.schedule('30 58 8 * * *', async() => {
-    // cron.schedule('30 09 19 * * *', async() => {
+    // cron.schedule('30 12 15 * * *', async() => {
         const mom = new Monthly();
         await mom.main();
-        sendKickCall(mom.kickMemText);
+        await kickCall(MessageEmbed, client, mom.kickMemText, callCenterCh, thunderRole, config);
     },{
         scheduled: true,
         timezone: "Asia/Tokyo"
@@ -177,17 +133,3 @@ client.on("interactionCreate", async (interaction) => {
 client.login(token)
     .catch(console.error);
 
-function sendKickCall(text){
-    const embed = new MessageEmbed()
-                    .setTitle('__**:cherry_blossom:非アクティブメンバー粛清大会:cherry_blossom:**__')
-                    .setDescription('**非アクティブ且つDiscordクラン鯖未参加プレイヤー**を部隊よりキックします。\n候補者は下記の通りです。不具合により誤検出される場合があります。\n該当者は至急連絡されたし。')
-                    .addFields(
-                        {   
-                            name:`粛正対象者一覧`, 
-                            value:`${text}\n※非アクティブプレイヤー\n\tWarThunder部門入隊後${config.KickMember.progress}日が経過し直近30日のアクティビティが${config.KickMember.minactivity}以下の者`
-                        })
-                    .setColor('#00ff00')
-                    .setTimestamp();
-
-    client.channels.cache.get(callCenterCh).send({content: `<@&${thunderRole}>`, embeds: [embed] });
-}
