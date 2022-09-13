@@ -56,7 +56,7 @@ module.exports = {
     async execute_messageComponents(interaction, client) {
         if (interaction.message.interaction.commandName === 'kickmem') {
             if (interaction.customId === "kick-ok") {
-                await kickCall(MessageEmbed, client, interaction.message.content.slice(16), callCenterCh, thunderRole, config);
+                await kickCall(MessageEmbed, client, interaction.message.content.slice(16), clanNewsCh, thunderRole, config);
                 interaction.update({
                     content: "告知投下しました！",
                     components: []
