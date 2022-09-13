@@ -48,7 +48,6 @@ const fixedTermReport = (async(MessageEmbed, client, daily, ch)=>{
 });
 
 const kickCall = (async(MessageEmbed, client, text, ch, thunderRole, config)=>{
-    console.log("通過3");
     const embed = new MessageEmbed()
                     .setTitle('__**:cherry_blossom:非アクティブメンバー粛清大会:cherry_blossom:**__')
                     .setDescription('**非アクティブ且つDiscordクラン鯖未参加プレイヤー**を部隊よりキックします。\n候補者は下記の通りです。不具合により誤検出される場合があります。\n該当者は至急連絡されたし。')
