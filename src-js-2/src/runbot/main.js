@@ -118,7 +118,10 @@ class Monthly{
     async main(){
         const [discordusers, thunderusers] = await Promise.all([IntegrationApiRequest.requestDiscord(), IntegrationApiRequest.requestThunder()]);
         this.kickMem = await OperationDatabase.Monthly(thunderusers, discordusers);
-        //OperationDatabase.LetLeftUser(thunderUsers, discordUsers);
+    }
+    async kickMember(){
+        const [discordusers, thunderusers] = await Promise.all([IntegrationApiRequest.requestDiscord(), IntegrationApiRequest.requestThunder()]);
+        this.kickMem = await OperationDatabase.LetLeftUser(thunderusers, discordusers);
     }
     get kickMemText(){
         let text = "";
