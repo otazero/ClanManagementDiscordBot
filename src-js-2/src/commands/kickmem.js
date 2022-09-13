@@ -1,3 +1,6 @@
+
+const clanmaster = "491578007392092170";
+
 module.exports = {
     data: {
         name: "kickmem",
@@ -5,7 +8,12 @@ module.exports = {
     },
     async execute(interaction) {
         if (interaction.commandName === 'kickmem') {
-            await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
+            if(interaction.member.roles.cache.some((role) => {return role.id === clanmaster})){
+                
+            }
+            else{
+                await interaction.reply({ content: '管理者限定コマンドのため無効な操作です。', ephemeral: true });
+            }
         }
     }
 }
