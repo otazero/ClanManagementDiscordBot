@@ -36,7 +36,7 @@ module.exports = {
             },
         ],
     },
-    async execute(interaction) {
+    async execute_commands(interaction, client) {
         if (interaction.commandName === 'info') {
             await interaction.reply(`infoコマンド実行`);
         }

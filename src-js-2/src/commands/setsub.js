@@ -11,7 +11,7 @@ module.exports = {
             }
         ]
     },
-    async execute(interaction) {
+    async execute_commands(interaction, client) {
         if (interaction.commandName === 'setsub') {
             await interaction.reply(`サブ垢コマンド実行`);
         }
