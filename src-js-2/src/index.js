@@ -1,5 +1,8 @@
-const { Client , Intents, MessageEmbed, Permissions} = require('discord.js');
+const { Client , Intents, MessageEmbed, Permissions, MessageButton, Modal, TextInputComponent, MessageActionRow} = require('discord.js');
 const {Daily, Monthly} = require(`./runbot/main.js`);
+const {fixedTermReport, kickCall} = require(`./messages/message.js`);
+
+const discordServerInfoData = require('../template/discordServerInfo.json');
 
 const client = new Client({
     intents: Object.values(Intents.FLAGS)
@@ -15,19 +18,41 @@ const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 const token = config.Credentials.token;
 
 /* ロールID */
-const clanMemberRole = "558947013744525313";
-const genroMemberRole = "483571690429743115";
-const botRole = "558945569624817684";
-const thunderRole = "746933519518924910";
+const clanMemberRole = discordServerInfoData.roles.clanMemberRole;
+const genroMemberRole = discordServerInfoData.roles.genroMemberRole;
+const botRole = discordServerInfoData.roles.botRole;
+const thunderRole = discordServerInfoData.roles.thunderRole;
 
 /* チャンネルID */
-const clanNewsCh = "819208111017295973";
-const changeRoleCallCh = "1016533368604725390";
-const testDropCh = "967753820052533248";
-const callCenterCh = "747434239456313425";
+const clanNewsCh = discordServerInfoData.channels.clanNewsCh;
+const changeRoleCallCh = discordServerInfoData.channels.changeRoleCallCh;
+const testDropCh = discordServerInfoData.channels.testDropCh;
+const callCenterCh = discordServerInfoData.channels.callCenterCh;
+
+
+/* コマンドを読み込み */
+const commands = (()=>{
+    const commands = {};
+    const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const command = require(`./commands/${file}`);
+        commands[command.data.name] = command;
+    }
+    return commands;
+})();
+
 
 'use strict';
 client.once('ready', async() => {
+    /* コマンドを登録 */
+    const data = (()=>{
+        const data = [];
+        for (const commandName in commands) {
+            data.push(commands[commandName].data);
+        }
+        return data;
+    })();    
+    await client.application.commands.set(data, config.DiscordConfig.guildid);
     console.log('接続しました！', new Date());
 });
 
@@ -38,54 +63,9 @@ client.on('ready', async() => {
         const daily = new Daily();
         await daily.main();
         console.log(daily.test);
-        
-        const embed = new MessageEmbed()
-                    .setTitle('定時報告')
-                    .setDescription('本日も一日お疲れさまでした！定時報告です！')
-                    .addFields(
-                        {   
-                            name:`🌸ご入隊ありがとうございます🌸`, 
-                            value:`本日${daily.wotbEnters.length+daily.thunderEnters.length+daily.discordEnters.length}名の方が当クランに参加してくださいました！\nよろしくね～♪`
-                        }, 
-                        {
-                            name:'<:WT:747482544714547231>WarThunder部門', 
-                            value:`${daily.thunderEntersText}`,
-                            inline:true
-                        }, 
-                        {
-                            name:'<:Blitz:755234073957367938>World of Tanks Blitz部門', 
-                            value:`${daily.wotbEntersText}`, 
-                            inline:true
-                        },
-                        {
-                            name:'<:discord:1016346034760327218>クランサーバー部門', 
-                            value:`${daily.discordEntersText}`, 
-                            inline:true
-                        },
-                        {   
-                            name:`🎉お疲れさまでした🎉`, 
-                            value:`本日${daily.wotbLefters.length+daily.thunderLefters.length+daily.discordLefters.length}名の方が脱退しました。\n今までありがとうございました。`
-                        }, 
-                        {
-                            name:'<:WT:747482544714547231>WarThunder部門', 
-                            value:`${daily.thunderLeftersText}`,
-                            inline:true
-                        }, 
-                        {
-                            name:'<:Blitz:755234073957367938>World of Tanks Blitz部門', 
-                            value:`${daily.wotbLeftersText}`, 
-                            inline:true
-                        },
-                        {
-                            name:'<:discord:1016346034760327218>クランサーバー部門', 
-                            value:`${daily.discordLeftersText}`, 
-                            inline:true
-                        },)
-                    .setColor('#800080')
-                    .setTimestamp();
+        // 定時報告送信
+        await fixedTermReport(MessageEmbed, client, daily, clanNewsCh);
 
-        client.channels.cache.get(clanNewsCh).send({ embeds: [embed] });
-        
         // クランメンバー→元老
         const discordMemberInfo = client.guilds.cache.get(`${config.DiscordConfig.guildid}`);
         daily.roleChangers.forEach(obj => {
@@ -117,10 +97,10 @@ client.on('ready', async() => {
     });
     // アクテビティ更新
     cron.schedule('30 58 8 * * *', async() => {
-    // cron.schedule('30 09 19 * * *', async() => {
+    // cron.schedule('30 12 15 * * *', async() => {
         const mom = new Monthly();
         await mom.main();
-        sendKickCall(mom.kickMemText);
+        await kickCall(MessageEmbed, client, mom.kickMemText, callCenterCh, thunderRole, config);
     },{
         scheduled: true,
         timezone: "Asia/Tokyo"
@@ -136,20 +116,49 @@ client.on("messageCreate", (message) => {
     }
 });
 
+client.on("interactionCreate", async (interaction) => {
+    // console.log("\n\n\n\n\n");
+    if(interaction.isCommand()) {
+        const command = commands[interaction.commandName];
+        try {
+            await command.execute_commands(interaction, client);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'よくわかんないけど、コマンド実行時にエラー出たよ',
+                ephemeral: true,
+            })
+        }
+    }
+    else if(interaction.isMessageComponent()){
+        // console.log(interaction.message.interaction.commandName);
+        const command = commands[interaction.message.interaction.commandName];
+        try {
+            await command.execute_messageComponents(interaction, client);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'よくわかんないけど、MessageComponent実行時にエラー出たよ',
+                ephemeral: true,
+            })
+        }
+    }
+    else if (interaction.isModalSubmit()){
+        // console.log(interaction.message.interaction.commandName);
+        const command = commands[interaction.message.interaction.commandName];
+        try {
+            await command.execute_modals(interaction, client);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'よくわかんないけど、Modal実行時にエラー出たよ',
+                ephemeral: true,
+            })
+        }
+    }
+    
+});
+
 client.login(token)
     .catch(console.error);
 
-function sendKickCall(text){
-    const embed = new MessageEmbed()
-                    .setTitle('__**:cherry_blossom:非アクティブメンバー粛清大会:cherry_blossom:**__')
-                    .setDescription('**非アクティブ且つDiscordクラン鯖未参加プレイヤー**を部隊よりキックします。\n候補者は下記の通りです。不具合により誤検出される場合があります。\n該当者は至急連絡されたし。')
-                    .addFields(
-                        {   
-                            name:`粛正対象者一覧`, 
-                            value:`${text}\n※非アクティブプレイヤー\n\tWarThunder部門入隊後${config.KickMember.progress}日が経過し直近30日のアクティビティが${config.KickMember.minactivity}以下の者`
-                        })
-                    .setColor('#00ff00')
-                    .setTimestamp();
-
-    client.channels.cache.get(callCenterCh).send({content: `<@&${thunderRole}>`, embeds: [embed] });
-}
