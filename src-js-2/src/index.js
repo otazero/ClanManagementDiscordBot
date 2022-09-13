@@ -43,6 +43,7 @@ const commands = (()=>{
 
 
 'use strict';
+
 client.once('ready', async() => {
     /* コマンドを登録 */
     const data = (()=>{
@@ -54,6 +55,7 @@ client.once('ready', async() => {
     })();    
     await client.application.commands.set(data, config.DiscordConfig.guildid);
     console.log('接続しました！', new Date());
+    client.user.setPresence({ activities: [{ name: '神げー界隈', type:"COMPETING" }], status: 'online' });
 });
 
 client.on('ready', async() => {
