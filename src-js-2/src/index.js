@@ -1,6 +1,8 @@
-const { Client , Intents, MessageEmbed, Permissions} = require('discord.js');
+const { Client , Intents, MessageEmbed, Permissions, MessageButton, Modal, TextInputComponent, MessageActionRow} = require('discord.js');
 const {Daily, Monthly} = require(`./runbot/main.js`);
 const {fixedTermReport, kickCall} = require(`./messages/message.js`);
+
+const discordServerInfoData = require('../template/discordServerInfo.json');
 
 const client = new Client({
     intents: Object.values(Intents.FLAGS)
@@ -16,16 +18,16 @@ const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 const token = config.Credentials.token;
 
 /* ロールID */
-const clanMemberRole = "558947013744525313";
-const genroMemberRole = "483571690429743115";
-const botRole = "558945569624817684";
-const thunderRole = "746933519518924910";
+const clanMemberRole = discordServerInfoData.roles.clanMemberRole;
+const genroMemberRole = discordServerInfoData.roles.genroMemberRole;
+const botRole = discordServerInfoData.roles.botRole;
+const thunderRole = discordServerInfoData.roles.thunderRole;
 
 /* チャンネルID */
-const clanNewsCh = "819208111017295973";
-const changeRoleCallCh = "1016533368604725390";
-const testDropCh = "967753820052533248";
-const callCenterCh = "747434239456313425";
+const clanNewsCh = discordServerInfoData.channels.clanNewsCh;
+const changeRoleCallCh = discordServerInfoData.channels.changeRoleCallCh;
+const testDropCh = discordServerInfoData.channels.testDropCh;
+const callCenterCh = discordServerInfoData.channels.callCenterCh;
 
 
 /* コマンドを読み込み */
@@ -115,19 +117,46 @@ client.on("messageCreate", (message) => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-    if (!interaction.isCommand()) {
-        return;
+    // console.log("\n\n\n\n\n");
+    if(interaction.isCommand()) {
+        const command = commands[interaction.commandName];
+        try {
+            await command.execute_commands(interaction, client);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'よくわかんないけど、コマンド実行時にエラー出たよ',
+                ephemeral: true,
+            })
+        }
     }
-    const command = commands[interaction.commandName];
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({
-            content: 'There was an error while executing this command!',
-            ephemeral: true,
-        })
+    else if(interaction.isMessageComponent()){
+        // console.log(interaction.message.interaction.commandName);
+        const command = commands[interaction.message.interaction.commandName];
+        try {
+            await command.execute_messageComponents(interaction, client);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'よくわかんないけど、MessageComponent実行時にエラー出たよ',
+                ephemeral: true,
+            })
+        }
     }
+    else if (interaction.isModalSubmit()){
+        // console.log(interaction.message.interaction.commandName);
+        const command = commands[interaction.message.interaction.commandName];
+        try {
+            await command.execute_modals(interaction, client);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'よくわかんないけど、Modal実行時にエラー出たよ',
+                ephemeral: true,
+            })
+        }
+    }
+    
 });
 
 client.login(token)
