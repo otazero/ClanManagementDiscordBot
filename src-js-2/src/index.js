@@ -22,6 +22,8 @@ const clanMemberRole = discordServerInfoData.roles.clanMemberRole;
 const genroMemberRole = discordServerInfoData.roles.genroMemberRole;
 const botRole = discordServerInfoData.roles.botRole;
 const thunderRole = discordServerInfoData.roles.thunderRole;
+const gestRole = discordServerInfoData.roles.gestRole;
+const plzyourselfRole = discordServerInfoData.roles.plzyourselfRole;
 
 /* チャンネルID */
 const clanNewsCh = discordServerInfoData.channels.clanNewsCh;
@@ -77,6 +79,10 @@ client.on('ready', async() => {
                     member.roles.add(clanMemberRole);
                     // 元老ロール剥奪
                     member.roles.remove(genroMemberRole);
+                    // ゲストロール剥奪
+                    member.roles.remove(gestRole);
+                    // 自己紹介してね剥奪
+                    member.roles.remove(plzyourselfRole);
                 });
             }
             else if(obj.change == "toGenro"){
