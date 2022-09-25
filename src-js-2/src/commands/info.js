@@ -41,6 +41,7 @@ class makeProfileImg{
     async makeFull(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
+            puppeteerArgs: {executablePath: "chromium-browser", args: ["--no-sandbox", "--disable-setuid-sandbox"]},
             type: 'png',
             transparent: true,
             html: `
