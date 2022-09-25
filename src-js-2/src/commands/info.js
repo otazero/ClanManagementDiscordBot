@@ -217,6 +217,7 @@ class makeProfileImg{
     async makeThunder(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
+            puppeteerArgs: {executablePath: "chromium-browser", args: ["--no-sandbox", "--disable-setuid-sandbox"]},
             type: 'png',
             transparent: true,
             html: `
@@ -384,6 +385,7 @@ class makeProfileImg{
     async makeWotb(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
+            puppeteerArgs: {executablePath: "chromium-browser", args: ["--no-sandbox", "--disable-setuid-sandbox"]},
             type: 'png',
             transparent: true,
             html: `
@@ -551,6 +553,7 @@ class makeProfileImg{
     async makeDiscord(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
+            puppeteerArgs: {executablePath: "chromium-browser", args: ["--no-sandbox", "--disable-setuid-sandbox"]},
             type: 'png',
             transparent: true,
             html: `
