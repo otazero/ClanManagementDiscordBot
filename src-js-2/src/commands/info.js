@@ -34,6 +34,10 @@ class makeProfileImg{
         const hiduke=new Date();             
         this.date = `${hiduke.getFullYear()}-${hiduke.getMonth()+1}-${hiduke.getDate()} ${hiduke.getHours()}:${hiduke.getMinutes()}:${hiduke.getSeconds()}`;
     }
+    /**
+     * フルプロフィール画像
+     * @returns 
+     */
     async makeFull(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
@@ -201,13 +205,14 @@ class makeProfileImg{
                 </body>
             </html>`,
             content: { backgroundImg:dataURI_background, thunderLogo: dataURI_thunder, wotbLogo: dataURI_wotb }
-        })/*.then((image) => {
-            console.log('The image was created successfully!')
-            console.log(image);
-        });*/
+        });
         console.log('The image was created successfully!');
         return image;
     }
+    /**
+     * WarThunderだけのプロフィール画像
+     * @returns 
+     */
     async makeThunder(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
@@ -367,13 +372,14 @@ class makeProfileImg{
                 </body>
             </html>`,
             content: { backgroundImg:dataURI_background, thunderLogo: dataURI_thunder, wotbLogo: dataURI_wotb }
-        })/*.then((image) => {
-            console.log('The image was created successfully!')
-            console.log(image);
-        });*/
+        });
         console.log('The image was created successfully!');
         return image;
     }
+    /**
+     * Wotbだけのプロフィール画像
+     * @returns 
+     */
     async makeWotb(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
@@ -533,13 +539,14 @@ class makeProfileImg{
                 </body>
             </html>`,
             content: { backgroundImg:dataURI_background, thunderLogo: dataURI_thunder, wotbLogo: dataURI_wotb }
-        })/*.then((image) => {
-            console.log('The image was created successfully!')
-            console.log(image);
-        });*/
+        });
         console.log('The image was created successfully!');
         return image;
     }
+    /**
+     * Discordだけのプロフィール画像
+     * @returns 
+     */
     async makeDiscord(){
         const image = await nodeHtmlToImage({
             /*output: './image.png',*/
@@ -689,10 +696,7 @@ class makeProfileImg{
                 </body>
             </html>`,
             content: { backgroundImg:dataURI_background, thunderLogo: dataURI_thunder, wotbLogo: dataURI_wotb }
-        })/*.then((image) => {
-            console.log('The image was created successfully!')
-            console.log(image);
-        });*/
+        });
         console.log('The image was created successfully!');
         return image;
     }
