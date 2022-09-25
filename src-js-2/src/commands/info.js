@@ -797,6 +797,9 @@ module.exports = {
                     });
                 }
             }
+            else if(interaction.options.getSubcommand() === `activity`){
+                await interaction.reply("工事中");
+            }
         }
     }
 }
