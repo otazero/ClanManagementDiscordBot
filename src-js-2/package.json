@@ -1,6 +1,6 @@
 {
   "name": "cran-management-discordbot",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "クランの管理自動化BOT",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,7 @@
     "ini": "^3.0.0",
     "mysql2": "^2.3.3",
     "node-cron": "^3.0.2",
+    "node-html-to-image": "^3.2.4",
     "request": "^2.88.2"
   }
 }
