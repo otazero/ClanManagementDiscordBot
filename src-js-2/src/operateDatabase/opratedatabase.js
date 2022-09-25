@@ -360,7 +360,7 @@ class OperationDatabase{
             console.log(e);
         }
 
-        const [result, gomi] = await mycon.query(`SELECT d_user_id, d_enter_at, d_ign, t_ign, w_ign, t_wt_members.r_id as t_r_id, w_wotb_members.r_id as w_r_id, t_enter_at, w_enter_at FROM d_discord_members  LEFT JOIN t_wt_members ON t_wt_members.t_user_id = d_discord_members.t_user_id LEFT JOIN w_wotb_members ON w_wotb_members.w_user_id = d_discord_members.w_user_id WHERE d_user_id = ${BigInt(discorduserid)} LIMIT 1`);
+        const [result, gomi] = await mycon.query(`SELECT d_user_id, d_enter_at, d_ign, d_name, t_ign, w_ign, t_wt_members.r_id as t_r_id, w_wotb_members.r_id as w_r_id, t_enter_at, w_enter_at FROM d_discord_members  LEFT JOIN t_wt_members ON t_wt_members.t_user_id = d_discord_members.t_user_id LEFT JOIN w_wotb_members ON w_wotb_members.w_user_id = d_discord_members.w_user_id WHERE d_user_id = ${BigInt(discorduserid)} LIMIT 1`);
 
         if( mycon ){
             mycon.end();
