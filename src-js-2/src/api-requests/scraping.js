@@ -53,10 +53,6 @@ class Scrape{
     }
 }
 
-Scrape.thunderClanTable();
-
-
-
 module.exports = {
     Scrape
 };
