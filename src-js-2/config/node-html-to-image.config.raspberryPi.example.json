@@ -1,0 +1,15 @@
+{
+    "TransparentPNG":{
+        "puppeteerArgs": {"executablePath": "chromium-browser", "args": ["--no-sandbox", "--disable-setuid-sandbox"]},
+        "type": "png",
+        "transparent": true
+    },
+    "NormalPNG":{
+        "puppeteerArgs": {"executablePath": "chromium-browser", "args": ["--no-sandbox", "--disable-setuid-sandbox"]},
+        "type": "png"
+    },
+    "Jpeg":{
+        "puppeteerArgs": {"executablePath": "chromium-browser", "args": ["--no-sandbox", "--disable-setuid-sandbox"]},
+        "type": "jpeg"
+    }
+}
