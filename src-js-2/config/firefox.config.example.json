@@ -1,5 +1,0 @@
-{ 
-    "headless": true , 
-    "product": "firefox",
-    "executablePath": "/bin/firefox"
-}
