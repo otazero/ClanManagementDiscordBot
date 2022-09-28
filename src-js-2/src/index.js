@@ -60,7 +60,7 @@ client.once('ready', async() => {
     client.user.setPresence({ activities: [{ name: '神げー界隈', type:"COMPETING" }], status: 'online' });
 });
 
-/*
+
 client.on('ready', async() => {
     cron.schedule('0 0 3 * * *', async() => {
         // TODO: スクレイピング→入退室の確認など
@@ -115,7 +115,7 @@ client.on('ready', async() => {
         timezone: "Asia/Tokyo"
     });
 });
-*/
+
 client.on("messageCreate", (message) => {
     if (message.author.bot) { //botからのmessageを無視
         return;
