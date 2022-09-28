@@ -32,6 +32,7 @@ module.exports = {
     async execute_commands(interaction, client) {
         if (interaction.commandName === 'kickmem') {
             if(interaction.member.roles.cache.some((role) => {return role.id === clanmasterRole})){
+                await interaction.deferReply();
                 const mom = new Monthly();
                 await mom.kickMember();
                 const tic1 = new MessageButton()
@@ -46,7 +47,7 @@ module.exports = {
                     .setCustomId("kick-cancel") //buttonにIDを割り当てる   *必須
                     .setStyle("DANGER")	//buttonのstyleを設定する  *必須
                     .setLabel("キャンセル")
-                await interaction.reply({ content: `以下のメンバーで宜しいですか？\n${mom.kickMemText}`, ephemeral: true, components: [new MessageActionRow().addComponents([tic1, tic2, tic3])] });
+                await interaction.editReply({ content: `以下のメンバーで宜しいですか？\n${mom.kickMemText}`, ephemeral: true, components: [new MessageActionRow().addComponents([tic1, tic2, tic3])] });
             }
             else{
                 await interaction.reply({ content: '管理者限定コマンドのため無効な操作です。', ephemeral: true });
