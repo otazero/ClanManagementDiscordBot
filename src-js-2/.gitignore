@@ -2,6 +2,7 @@
 config.ini
 config.yaml
 node-html-to-image.config.json
+firefox.config.json
 
 # ライブラリ
 node_modules
