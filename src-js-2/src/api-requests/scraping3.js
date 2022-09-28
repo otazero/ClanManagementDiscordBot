@@ -8,22 +8,18 @@ const config = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
 
 const URL = encodeURI(`https://warthunder.com/en/community/claninfo/${config.ThunderConfig.clanname}`);
 
-// puppeteer-extra is a drop-in replacement for puppeteer,
-// it augments the installed puppeteer with plugin functionality
+// puppeteer-extra は puppeteer のドロップイン置き換えです。
+// インストール済みの puppeteer にプラグイン機能を追加します。
 const puppeteer = require('puppeteer-extra')
-
-// add stealth plugin and use defaults (all evasion techniques)
-// const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-//puppeteer.use(StealthPlugin())
 
 // puppeteer usage as normal
 const main = async ()=>{
     const browser = await puppeteer.launch({ 
-        headless: true , 
-        //executablePath: 'chromium-browser', 
-        //args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: false , 
         product: "firefox",
-        executablePath: "/bin/firefox",
+        executablePath: 'C:/Program Files/Firefox Nightly/firefox.exe',    // 2. Firefox(Nightly)の実行パス 
+        userDataDir: 'D:/Programming/CREATE/ClanManagementDiscordBot/src-js-2/template', // 3. ユーザープロファイルの保存ディレクトリパス
+        args: ['-wait-for-browser']    // 4. Firefox(Nightly)の起動を待つ
     });
         console.log('Running tests..')
         // const context = await browser.newContext();
@@ -31,8 +27,6 @@ const main = async ()=>{
         await page.goto(URL)
         await page.waitForNavigation('load');
         await page.waitForSelector('div.content__title');
-        // await page.waitForTimeout(100000)
-        // await page.screenshot({ path: 'testresult.png', fullPage: true });
 
         const results = await page.$$("div.squadrons-members__grid-item");
         
@@ -41,7 +35,6 @@ const main = async ()=>{
             if(j > 5){
                 const text = await results[j].evaluate(e => e.innerText);
                 const i = Math.floor(j / 6) - 1;
-                //console.log(j, i, text);
                 switch (j % 6) {
                     case 0:
                         const temp = new ThunderUser();
@@ -55,15 +48,12 @@ const main = async ()=>{
                     case 2:
                         break;
                     case 3:
-                        // console.log(value.children[0].data.replace(/\s+/g, ''));
                         users[i].nowactive = Number(text);
                         break;
                     case 4:
-                        //　console.log(value.children[0].data.replace(/\s+/g, ''));
                         users[i].setrole = [text];
                         break;
                     case 5:
-                        //console.log(value.children[0].data.replace(/\s+/g, ''));
                         users[i].setEnter = text;
                         break;
                     default:
