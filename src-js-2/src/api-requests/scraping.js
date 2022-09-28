@@ -75,6 +75,7 @@ class Scrape{
     }
 }
 
+/*
 const startTime = performance.now();
 Scrape.thunderClanTable().then((users)=>{
     const endTime = performance.now();
@@ -83,7 +84,7 @@ Scrape.thunderClanTable().then((users)=>{
         console.log(user.ign);
     });
 }); 
-
+*/
 module.exports = {
     Scrape
 };
