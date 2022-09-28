@@ -1,3 +1,6 @@
+/**
+ * Win10用(chromium使ってます)
+ */
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 
 module.exports = {
