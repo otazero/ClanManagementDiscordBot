@@ -13,15 +13,22 @@ const URL = encodeURI(`https://warthunder.com/en/community/claninfo/${config.Thu
 const puppeteer = require('puppeteer-extra')
 
 // add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-puppeteer.use(StealthPlugin())
+// const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+//puppeteer.use(StealthPlugin())
 
 // puppeteer usage as normal
 const main = async ()=>{
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ 
+        headless: true , 
+        //executablePath: 'chromium-browser', 
+        //args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        product: "firefox",
+        executablePath: "/bin/firefox",
+    });
         console.log('Running tests..')
+        // const context = await browser.newContext();
         const page = await browser.newPage()
-        await page.goto('https://warthunder.com/en/community/claninfo/Schwarz%20Ritter')
+        await page.goto(URL)
         await page.waitForNavigation('load');
         await page.waitForSelector('div.content__title');
         // await page.waitForTimeout(100000)
@@ -34,7 +41,7 @@ const main = async ()=>{
             if(j > 5){
                 const text = await results[j].evaluate(e => e.innerText);
                 const i = Math.floor(j / 6) - 1;
-                console.log(j, i, text);
+                //console.log(j, i, text);
                 switch (j % 6) {
                     case 0:
                         const temp = new ThunderUser();
@@ -73,6 +80,6 @@ const main = async ()=>{
 const startTime = performance.now();
 main().then((users)=>{
     const endTime = performance.now();
-    console.log(users);
+    console.log(users[0]);
     console.log(`実行時間は ${(endTime - startTime)/1000} 秒です\n`);
 }); 
