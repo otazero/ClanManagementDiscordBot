@@ -25,7 +25,7 @@ const main = async ()=>{
         await page.waitForNavigation('load');
         await page.waitForSelector('div.content__title');
         // await page.waitForTimeout(100000)
-        await page.screenshot({ path: 'testresult.png', fullPage: true });
+        // await page.screenshot({ path: 'testresult.png', fullPage: true });
 
         const results = await page.$$("div.squadrons-members__grid-item");
         
