@@ -32,7 +32,7 @@ module.exports = {
     async execute_commands(interaction, client) {
         if (interaction.commandName === 'kickmem') {
             if(interaction.member.roles.cache.some((role) => {return role.id === clanmasterRole})){
-                await interaction.deferReply();
+                await interaction.deferReply({ephemeral: true });
                 const mom = new Monthly();
                 await mom.kickMember();
                 const tic1 = new MessageButton()
