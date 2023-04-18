@@ -2,7 +2,8 @@ body{
     width:640px;
     height: 450px;
     background-color: transparent;
-    
+    margin: 0px;
+    padding: 0px;
 }
 header{
     height: 30px;
@@ -31,7 +32,7 @@ div.discord{
 
     width:640px;
     height: 450px;
-    background: #ffffff url("{{backgroundImg}}");
+    background: #ffffff url({{backgroundImg}});
     border-radius: 30px;
     background-size: cover;
 }
@@ -58,6 +59,7 @@ div.name{
     font-family: "fantasy";
     text-shadow: 2px 2px 2px black;
 }
+
 div.discord-ign {
     position: absolute;
     top: 70px;
@@ -66,9 +68,10 @@ div.discord-ign {
 }
 div.discord-join-at {
     position: absolute;
-    top: 70;
-    right: 10;
+    top: 70px;
+    right: 20px;
 }
+
 div.game-info{
     width: 640px;
     height: 110px;

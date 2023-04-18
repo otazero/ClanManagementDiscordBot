@@ -8,10 +8,6 @@ const roles = require('../../template/roles.json');
 
 const env_config = require('../../config/node-html-to-image.config.json');
 
-const dataURI_background = dataURI('./images/space01.png');
-const dataURI_thunder = dataURI('./images/WarThunder.png');
-const dataURI_wotb = dataURI('./images/wotb.png');
-
 class makeProfileImg{
     constructor(result, interaction){
         this.env_config = env_config;
@@ -19,19 +15,32 @@ class makeProfileImg{
         this.discord_id = result.d_user_id;
         this.discord_name = result.d_name;
         this.discord_ign = result.d_ign;
-        this.discord_enter = result.d_enter_at;
         this.discord_role = this.#whatRole(result.d_r_id);
+        this.discord_enter_year = result.d_enter_at.getFullYear();
+        this.discord_enter_month = result.d_enter_at.getMonth()+1;
+        this.discord_enter_day = result.d_enter_at.getDate();
         
         this.thunder_ign = result.t_ign;
         this.thunder_role = this.#whatRole(result.t_r_id);
-        this.thunder_enter = result.t_enter_at;
+        this.thunder_enter_year = result.t_enter_at.getFullYear();
+        this.thunder_enter_month = result.t_enter_at.getMonth()+1;
+        this.thunder_enter_day = result.t_enter_at.getDate();
 
         this.wotb_ign = result.w_ign,
         this.wotb_role = this.#whatRole(result.w_r_id);
-        this.wotb_enter = result.w_enter_at;
+        this.wotb_enter_year = result.w_enter_at.getFullYear();
+        this.wotb_enter_month = result.w_enter_at.getMonth()+1;
+        this.wotb_enter_day = result.w_enter_at.getDate();
 
         const hiduke=new Date();             
         this.date = `${hiduke.getFullYear()}-${hiduke.getMonth()+1}-${hiduke.getDate()} ${hiduke.getHours()}:${hiduke.getMinutes()}:${hiduke.getSeconds()}`;
+    }
+
+    // dataURIを作成し、クラスメソッドに代入する
+    async init() {
+        this.dataURI_background = await dataURI('./images/space01.png');
+        this.thunderLogo = await dataURI('./images/WarThunder.png');
+        this.wotbLogo = await dataURI('./images/wotb.png');
     }
 
     /**
@@ -53,200 +62,23 @@ class makeProfileImg{
         // ページを読み込む
         await page.setContent(htmlContent);
         // CSSファイルを読み込む
-        const cssContent = fs.readFileSync(__dirname+'./html-project/assets/style.css', 'utf8');
-        cssContent
-            .replace("{{backgroundImg}}", dataURI_background)
+        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/style.css', 'utf8');
+        const cssContent = unreplacedCssContent
+            .replace("{{backgroundImg}}", this.dataURI_background)
             .replace("{{discord_role.color}}", this.discord_role.color);
         // CSSをHTMLページに追加する
         await page.addStyleTag({ content: cssContent });
         // スクリーンショットを撮る
         const screenshot = await page.screenshot({
-            type: 'jpeg',
-            encoding: 'binary' // バイナリー形式で取得するためにencodingを設定
+            type: 'png',
+            encoding: 'binary', // バイナリー形式で取得するためにencodingを設定
+            omitBackground: true
         });
-        await page.screenshot({ path: 'example.png' });
+        //await page.screenshot({ path: 'example.png', omitBackground: true});
         await browser.close();
         return screenshot;
     }
-
-
-    // puppeteerで画像を作成する。HTMLには画像を埋め込む。
-
-
-
-    /**
-     * フルプロフィール画像
-     * @returns 
-     */
-    /*
-    async makeFull(){
-        this.env_config.TransparentPNG.html =  `
-        <html>
-            <head>
-                <style>
-                    body{
-                        width:640px;
-                        height: 450px;
-                        background-color: transparent;
-                        
-                    }
-                    header{
-                        height: 30px;
-                        width: 620px;
-                        padding: 10px;
-
-                        font-size: 20px;
-                        color: #ffffff;
-                        font-weight: bold;
-                        font-family: "fantasy";
-                        text-shadow: 2px 2px 2px black;
-                    }
-                    .header-title {
-                        float: left;
-                    }
-                    .header-option {
-                        float: right;
-                    }
-                    div.discord{
-                        width: 620px;
-                        height: 120px;
-                        padding: 0px 10px;
-                        position: relative;
-                    }
-                    .ss{
-
-                        width:640px;
-                        height: 450px;
-                        background: #ffffff url("{{ backgroundImg }}");
-                        border-radius: 30px;
-                        background-size: cover;
-                    }
-                    .ssa {
-                        width:640px;
-                        height: 450px;
-                        background: rgba(255, 255, 255, 0.5);
-                        border-radius: 30px;
-                    }
-                    div.avater{
-                        float: left;
-                    }
-                    img.avater {
-                        border-radius: 10px;
-                        border: 8px solid gold;
-                    }
-                    div.name{
-                        margin: 0px;
-                        padding: 0px 0px;
-                        font-size: 35px;
-
-                        color: #ffffff;
-                        font-weight: bold;
-                        font-family: "fantasy";
-                        text-shadow: 2px 2px 2px black;
-                    }
-                    div.discord-ign {
-                        position: absolute;
-                        top: 70px;
-                        left: 130px;
-                        font-weight: bold;
-                    }
-                    div.discord-join-at {
-                        position: absolute;
-                        top: 70;
-                        right: 10;
-                    }
-                    div.game-info{
-                        width: 640px;
-                        height: 110px;
-                        background: rgba(255, 255, 255, 0.5);
-                    }
-                    img.logo {
-                        float: left;
-                    }
-                    
-                    p.ign{
-                        font-size: 30px;
-                        font-weight: bold;
-                        
-                        color: black;
-                    }
-                    div.role{
-                        background-color:${this.discord_role.color};
-                        margin: 0px 100px;
-                        width:200px;
-                        color: #ffffff;
-                        font-weight: bold;
-                    }
-                    div.join-at{
-                        color: blue;
-                        font-weight: bold;
-                    }
-                    p.option-title{
-                        font-size: 15px;
-                    }
-                    p.option-info{
-                        font-size: 20px;
-                    }
-                    footer {
-                        width: 620px;
-                        height: 30px;
-                        padding: 10px;
-                    }
-                    div.create{
-                        float: right;
-                        margin-top: 10px;
-                    }
-                    p{
-                        margin: 0px 5px;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="ss">
-                    <div class="ssa">
-                        <header>
-                            <div class="header-title">PROFILE</div>
-                            <div class="header-option">ID:${this.discord_id}</div>
-                        </header>
-                        <div class="discord">
-                            <div class="avater">
-                                <img class="avater" src="${this.discord_avater}" alt=""  width="100" height="100">
-                            </div>
-                            <div class="name">${this.discord_name}</div>
-                            <div class="discord-ign"><p class="option-title">Registered Player Name</p><p class="option-info">${this.discord_ign}</p></div>
-                            <div class="join-at discord-join-at"><p class="option-title">Join at</p><p>${this.discord_enter.getFullYear()}-${this.discord_enter.getMonth()+1}-${this.discord_enter.getDate()}</p></div>
-                        </div>
-                        <div class="game-pro">
-                            <div class="game-info">
-                                <img class="logo" src="{{ thunderLogo }}" alt=""  width="100" height="100">
-                                <div class="game-info-text">
-                                    <p class="ign">${this.thunder_ign}</p>
-                                    <div class="role"><p>${this.thunder_role.name}</p></div>
-                                    <div class="join-at"><p class="option-title">Join at</p><p>${this.thunder_enter.getFullYear()}-${this.thunder_enter.getMonth()+1}-${this.thunder_enter.getDate()}</p></div>
-                                </div>
-                            </div>
-                            <div class="game-info">
-                                <img class="logo" src="{{ wotbLogo }}" alt="" width="100" height="100">
-                                <div class="game-info-text">
-                                    <p class="ign">${this.wotb_ign}</p>
-                                    <div class="role"><p>${this.wotb_role.name}</p></div>
-                                    <div class="join-at"><p class="option-title">Join at</p><p>${this.wotb_enter.getFullYear()}-${this.wotb_enter.getMonth()+1}-${this.wotb_enter.getDate()}</p></div>
-                                </div>
-                            </div>
-                        </div>
-                        <footer>
-                            <div class="create">Created:${this.date}</div>
-                        </footer>
-                    </div>
-                </div>
-            </body>
-        </html>`;
-        this.env_config.TransparentPNG.content = { backgroundImg:dataURI_background, thunderLogo: dataURI_thunder, wotbLogo: dataURI_wotb };
-        const image = await nodeHtmlToImage(this.env_config.TransparentPNG);
-        console.log('The image was created successfully!');
-        return image;
-    }
-    */
+    
     /**
      * WarThunderだけのプロフィール画像
      * @returns 
@@ -793,6 +625,7 @@ module.exports = {
                     const r = result[0];
                     await interaction.deferReply();
                     const createImg = new makeProfileImg(r, interaction);
+                    await createImg.init();
                     // Buffer型を用意したかった...
                     let imageBuffer = Buffer.from("");
                     // フル表示
