@@ -78,7 +78,7 @@ class makeProfileImg{
         await browser.close();
         return screenshot;
     }
-    
+
     /**
      * WarThunderだけのプロフィール画像
      * @returns 
