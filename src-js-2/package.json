@@ -23,7 +23,9 @@
   "homepage": "https://github.com/Dorayaki-Chan/ClanManagementDiscordBot#readme",
   "dependencies": {
     "cheerio-httpcli": "^0.8.3",
+    "datauri": "^4.1.0",
     "discord.js": "^13.8.0",
+    "handlebars": "^4.7.7",
     "ini": "^3.0.0",
     "mysql2": "^2.3.3",
     "node-cron": "^3.0.2",

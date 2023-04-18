@@ -1,20 +1,16 @@
 const {MessageAttachment} = require("discord.js");
 const {OperationDatabase} = require('../operateDatabase/opratedatabase');
-const nodeHtmlToImage = require('node-html-to-image')
+const puppeteer = require('puppeteer');
 const fs = require('fs');
+const Handlebars = require('handlebars');
+const dataURI = require('datauri');
 const roles = require('../../template/roles.json');
 
 const env_config = require('../../config/node-html-to-image.config.json');
 
-const createURI = ((path)=>{
-    const image = fs.readFileSync(path);
-    const base64Image = new Buffer.from(image).toString('base64');
-    return 'data:image/png;base64,' + base64Image;
-});
-
-const dataURI_background = createURI('./images/space01.png');
-const dataURI_thunder = createURI('./images/WarThunder.png');
-const dataURI_wotb = createURI('./images/wotb.png');
+const dataURI_background = dataURI('./images/space01.png');
+const dataURI_thunder = dataURI('./images/WarThunder.png');
+const dataURI_wotb = dataURI('./images/wotb.png');
 
 class makeProfileImg{
     constructor(result, interaction){
@@ -37,6 +33,45 @@ class makeProfileImg{
         const hiduke=new Date();             
         this.date = `${hiduke.getFullYear()}-${hiduke.getMonth()+1}-${hiduke.getDate()} ${hiduke.getHours()}:${hiduke.getMinutes()}:${hiduke.getSeconds()}`;
     }
+
+    /**
+     * フルプロフィール画像を作成する
+     * @returns
+     */
+    async makeFull(){
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        // ページのサイズを指定
+        await page.setViewport({width: 640, height: 450});
+        // HTMLとCSSを指定
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                <style>
+                    /* CSSを指定 */
+                </style>
+                </head>
+                <body>
+                <!-- HTMLを指定 -->
+                </body>
+            </html>
+            `;
+        const options = {
+            type: 'jpeg',
+            encoding: 'binary' // バイナリー形式で取得するためにencodingを設定
+        };
+        await page.setContent(htmlContent);
+        const screenshot = await page.screenshot(options);
+        await browser.close();
+        return screenshot;
+    }
+
+
+    // puppeteerで画像を作成する。HTMLには画像を埋め込む。
+
+
+
     /**
      * フルプロフィール画像
      * @returns 
