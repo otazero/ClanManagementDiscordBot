@@ -39,30 +39,32 @@ class makeProfileImg{
      * @returns
      */
     async makeFull(){
+        // テンプレートを読み込む
         const browser = await puppeteer.launch();
+        // ページを開く
         const page = await browser.newPage();
         // ページのサイズを指定
         await page.setViewport({width: 640, height: 450});
-        // HTMLとCSSを指定
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                <style>
-                    /* CSSを指定 */
-                </style>
-                </head>
-                <body>
-                <!-- HTMLを指定 -->
-                </body>
-            </html>
-            `;
-        const options = {
+        // HTMLファイルを読み込み、動的な値を注入する
+        // Handelebarsを使って動的な値を注入する
+        const template = Handlebars.compile(fs.readFileSync(__dirname+'/html-project/public/full.html', 'utf8'));
+        // dataを作成する必要がある。
+        const htmlContent = template(this);
+        // ページを読み込む
+        await page.setContent(htmlContent);
+        // CSSファイルを読み込む
+        const cssContent = fs.readFileSync(__dirname+'./html-project/assets/style.css', 'utf8');
+        cssContent
+            .replace("{{backgroundImg}}", dataURI_background)
+            .replace("{{discord_role.color}}", this.discord_role.color);
+        // CSSをHTMLページに追加する
+        await page.addStyleTag({ content: cssContent });
+        // スクリーンショットを撮る
+        const screenshot = await page.screenshot({
             type: 'jpeg',
             encoding: 'binary' // バイナリー形式で取得するためにencodingを設定
-        };
-        await page.setContent(htmlContent);
-        const screenshot = await page.screenshot(options);
+        });
+        await page.screenshot({ path: 'example.png' });
         await browser.close();
         return screenshot;
     }
@@ -76,6 +78,7 @@ class makeProfileImg{
      * フルプロフィール画像
      * @returns 
      */
+    /*
     async makeFull(){
         this.env_config.TransparentPNG.html =  `
         <html>
@@ -243,6 +246,7 @@ class makeProfileImg{
         console.log('The image was created successfully!');
         return image;
     }
+    */
     /**
      * WarThunderだけのプロフィール画像
      * @returns 
