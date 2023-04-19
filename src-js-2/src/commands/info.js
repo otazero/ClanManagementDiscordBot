@@ -12,75 +12,92 @@ const env_config = require('../../config/node-html-to-image.config.json');
 // プロフィール画像を作成するクラス
 class makeProfileImg{
     constructor(result, interaction){
-        this.env_config = env_config;
-        this.discord_avater = interaction.user.displayAvatarURL();
-        this.discord_id = result.d_user_id;
-        this.discord_name = result.d_name;
-        this.discord_ign = result.d_ign;
-        this.discord_role = this.#whatRole(result.d_r_id);
-        this.discord_enter_year = result.d_enter_at.getFullYear();
-        this.discord_enter_month = result.d_enter_at.getMonth()+1;
-        this.discord_enter_day = result.d_enter_at.getDate();
-        
-        this.thunder_ign = result.t_ign;
-        this.thunder_role = this.#whatRole(result.t_r_id);
-        this.thunder_enter_year = result.t_enter_at.getFullYear();
-        this.thunder_enter_month = result.t_enter_at.getMonth()+1;
-        this.thunder_enter_day = result.t_enter_at.getDate();
 
-        this.wotb_ign = result.w_ign,
-        this.wotb_role = this.#whatRole(result.w_r_id);
-        this.wotb_enter_year = result.w_enter_at.getFullYear();
-        this.wotb_enter_month = result.w_enter_at.getMonth()+1;
-        this.wotb_enter_day = result.w_enter_at.getDate();
+        const discord = {
+            avater: interaction.user.displayAvatarURL(),
+            id: result.d_user_id,
+            name: result.d_name,
+            ign: result.d_ign,
+            role: this.#whatRole(result.d_r_id),
+            enter_year: result.d_enter_at.getFullYear(),
+            enter_month: result.d_enter_at.getMonth()+1,
+            enter_day: result.d_enter_at.getDate()
+        };
 
-        const hiduke=new Date();             
-        this.date = `${hiduke.getFullYear()}-${hiduke.getMonth()+1}-${hiduke.getDate()} ${hiduke.getHours()}:${hiduke.getMinutes()}:${hiduke.getSeconds()}`;
+        const thunder = {
+            ign: result.t_ign,
+            role: this.#whatRole(result.t_r_id),
+            enter_year: result.t_enter_at.getFullYear(),
+            enter_month: result.t_enter_at.getMonth()+1,
+            enter_day: result.t_enter_at.getDate()
+        };
+
+        const wotb = {
+            ign: result.w_ign,
+            role: this.#whatRole(result.w_r_id),
+            enter_year: result.w_enter_at.getFullYear(),
+            enter_month: result.w_enter_at.getMonth()+1,
+            enter_day: result.w_enter_at.getDate()
+        };
+
+        const date = new Date();
+        this.data = {
+            env_config,
+            discord,
+            thunder,
+            wotb,
+            date: `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+        }
     }
 
     // dataURIを作成し、クラスメソッドに代入する
     async init() {
-        this.dataURI_background = await dataURI('./images/space01.png');
-        this.thunderLogo = await dataURI('./images/WarThunder.png');
-        this.wotbLogo = await dataURI('./images/wotb.png');
+        this.data.pic = {
+            dataURI_background : await dataURI('./images/space01.png'),
+            thunderLogo : await dataURI('./images/WarThunder.png'),
+            wotbLogo : await dataURI('./images/wotb.png')
+        }
     }
+
+    async #createProfile({ htmlFile, type, height }) {
+        // ブラウザを起動する
+        const browser = await puppeteer.launch();
+        // ページを作成する
+        const page = await browser.newPage();
+        // ページのサイズを設定する
+        await page.setViewport({ width: 640, height: height });
+        // テンプレートを読み込む
+        const template = Handlebars.compile(fs.readFileSync(__dirname + `/html-project/public/${htmlFile}.html`, 'utf8'));
+        const htmlContent = template(this.data);
+        // ページにテンプレートをセットする
+        await page.setContent(htmlContent);
+        // CSSを読み込む
+        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
+        const cssContent = unreplacedCssContent
+            .replace("{{body.height}}", `${height}px`)
+            .replace("{{backgroundImg}}", this.data.pic.dataURI_background)
+            .replace("{{discord_role.color}}", this.data.discord.role.color);
+        await page.addStyleTag({ content: cssContent });
+        // 画像を作成する
+        const screenshot = await page.screenshot({
+            type: 'png',
+            encoding: 'binary',
+            omitBackground: true
+        });
+        //ローカルに保存する場合
+        //await page.screenshot({ path: `example_${htmlFile}.png`, omitBackground: true });
+        await browser.close();
+        console.log('The image was created successfully!');
+        return screenshot;
+    }
+
 
     /**
      * フルプロフィール画像を作成する
      * @returns
      */
     async makeFull(){
-        // テンプレートを読み込む
-        const browser = await puppeteer.launch();
-        // ページを開く
-        const page = await browser.newPage();
-        // ページのサイズを指定
-        await page.setViewport({width: 640, height: 450});
-        // HTMLファイルを読み込み、動的な値を注入する
-        // Handelebarsを使って動的な値を注入する
-        const template = Handlebars.compile(fs.readFileSync(__dirname+'/html-project/public/full.html', 'utf8'));
-        // dataを作成する必要がある。
-        const htmlContent = template(this);
-        // ページを読み込む
-        await page.setContent(htmlContent);
-        // CSSファイルを読み込む
-        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
-        const cssContent = unreplacedCssContent
-            .replace("{{body.height}}", "450px")
-            .replace("{{backgroundImg}}", this.dataURI_background)
-            .replace("{{discord_role.color}}", this.discord_role.color);
-        // CSSをHTMLページに追加する
-        await page.addStyleTag({ content: cssContent });
-        // スクリーンショットを撮る
-        const screenshot = await page.screenshot({
-            type: 'png',
-            encoding: 'binary', // バイナリー形式で取得するためにencodingを設定
-            omitBackground: true
-        });
-        //await page.screenshot({ path: 'example.png', omitBackground: true});
-        await browser.close();
-        console.log('The image was created successfully!');
-        return screenshot;
+        return await this.#createProfile({htmlFile:"full", type:"png", height: 450});
     }
 
     /**
@@ -88,111 +105,21 @@ class makeProfileImg{
      * @returns 
      */
     async makeThunder(){
-        // テンプレートを読み込む
-        const browser = await puppeteer.launch();
-        // ページを開く
-        const page = await browser.newPage();
-        // ページのサイズを指定
-        await page.setViewport({width: 640, height: 350});
-        // HTMLファイルを読み込み、動的な値を注入する
-        // Handelebarsを使って動的な値を注入する
-        const template = Handlebars.compile(fs.readFileSync(__dirname+'/html-project/public/thunder.html', 'utf8'));
-        // dataを作成する必要がある。
-        const htmlContent = template(this);
-        // ページを読み込む
-        await page.setContent(htmlContent);
-        // CSSファイルを読み込む
-        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
-        const cssContent = unreplacedCssContent
-            .replace("{{body.height}}", "350px")
-            .replace("{{backgroundImg}}", this.dataURI_background)
-            .replace("{{discord_role.color}}", this.discord_role.color);
-        // CSSをHTMLページに追加する
-        await page.addStyleTag({ content: cssContent });
-        // スクリーンショットを撮る
-        const screenshot = await page.screenshot({
-            type: 'png',
-            encoding: 'binary', // バイナリー形式で取得するためにencodingを設定
-            omitBackground: true
-        });
-        //await page.screenshot({ path: 'example.png', omitBackground: true});
-        await browser.close();
-        console.log('The image was created successfully!');
-        return screenshot;
+        return await this.#createProfile({htmlFile:"thunder", type:"png", height: 350});
     }
     /**
      * Wotbだけのプロフィール画像
      * @returns 
      */
     async makeWotb(){
-        // テンプレートを読み込む
-        const browser = await puppeteer.launch();
-        // ページを開く
-        const page = await browser.newPage();
-        // ページのサイズを指定
-        await page.setViewport({width: 640, height: 350});
-        // HTMLファイルを読み込み、動的な値を注入する
-        // Handelebarsを使って動的な値を注入する
-        const template = Handlebars.compile(fs.readFileSync(__dirname+'/html-project/public/wotb.html', 'utf8'));
-        // dataを作成する必要がある。
-        const htmlContent = template(this);
-        // ページを読み込む
-        await page.setContent(htmlContent);
-        // CSSファイルを読み込む
-        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
-        const cssContent = unreplacedCssContent
-            .replace("{{body.height}}", "350px")
-            .replace("{{backgroundImg}}", this.dataURI_background)
-            .replace("{{discord_role.color}}", this.discord_role.color);
-        // CSSをHTMLページに追加する
-        await page.addStyleTag({ content: cssContent });
-        // スクリーンショットを撮る
-        const screenshot = await page.screenshot({
-            type: 'png',
-            encoding: 'binary', // バイナリー形式で取得するためにencodingを設定
-            omitBackground: true
-        });
-        //await page.screenshot({ path: 'example.png', omitBackground: true});
-        await browser.close();
-        console.log('The image was created successfully!');
-        return screenshot;
+        return await this.#createProfile({htmlFile:"wotb", type:"png", height: 350});
     }
     /**
      * Discordだけのプロフィール画像
      * @returns 
      */
     async makeDiscord(){
-        // テンプレートを読み込む
-        const browser = await puppeteer.launch();
-        // ページを開く
-        const page = await browser.newPage();
-        // ページのサイズを指定
-        await page.setViewport({width: 640, height: 230});
-        // HTMLファイルを読み込み、動的な値を注入する
-        // Handelebarsを使って動的な値を注入する
-        const template = Handlebars.compile(fs.readFileSync(__dirname+'/html-project/public/discord.html', 'utf8'));
-        // dataを作成する必要がある。
-        const htmlContent = template(this);
-        // ページを読み込む
-        await page.setContent(htmlContent);
-        // CSSファイルを読み込む
-        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
-        const cssContent = unreplacedCssContent
-            .replace("{{body.height}}", "230px")
-            .replace("{{backgroundImg}}", this.dataURI_background)
-            .replace("{{discord_role.color}}", this.discord_role.color);
-        // CSSをHTMLページに追加する
-        await page.addStyleTag({ content: cssContent });
-        // スクリーンショットを撮る
-        const screenshot = await page.screenshot({
-            type: 'png',
-            encoding: 'binary', // バイナリー形式で取得するためにencodingを設定
-            omitBackground: true
-        });
-        //await page.screenshot({ path: 'example.png', omitBackground: true});
-        await browser.close();
-        console.log('The image was created successfully!');
-        return screenshot;
+        return await this.#createProfile({htmlFile:"discord", type:"png", height: 230});
     }
     /**
      * 
