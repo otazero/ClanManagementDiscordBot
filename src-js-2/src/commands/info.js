@@ -62,7 +62,7 @@ class makeProfileImg{
         // ページを読み込む
         await page.setContent(htmlContent);
         // CSSファイルを読み込む
-        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/style.css', 'utf8');
+        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
         const cssContent = unreplacedCssContent
             .replace("{{backgroundImg}}", this.dataURI_background)
             .replace("{{discord_role.color}}", this.discord_role.color);
