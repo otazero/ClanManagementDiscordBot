@@ -1,6 +1,6 @@
 body{
     width:640px;
-    height: {{body.height}}px;
+    height: {{body.height}};
     background-color: transparent;
     margin: 0px;
     padding: 0px;
