@@ -1,6 +1,6 @@
 body{
     width:640px;
-    height: 450px;
+    height: {{body.height}}px;
     background-color: transparent;
     margin: 0px;
     padding: 0px;
@@ -31,14 +31,14 @@ div.discord{
 .ss{
 
     width:640px;
-    height: 450px;
+    height: {{body.height}}px;
     background: #ffffff url({{backgroundImg}});
     border-radius: 30px;
     background-size: cover;
 }
 .ssa {
     width:640px;
-    height: 450px;
+    height: {{body.height}}px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 30px;
 }
