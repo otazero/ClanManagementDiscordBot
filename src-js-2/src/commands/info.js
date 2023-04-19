@@ -123,12 +123,37 @@ class makeProfileImg{
      * @returns 
      */
     async makeWotb(){
-        this.env_config.TransparentPNG.html = `
-        `;
-        this.env_config.TransparentPNG.content = { backgroundImg:dataURI_background, thunderLogo: dataURI_thunder, wotbLogo: dataURI_wotb };
-        const image = await nodeHtmlToImage(this.env_config.TransparentPNG);
+        // テンプレートを読み込む
+        const browser = await puppeteer.launch();
+        // ページを開く
+        const page = await browser.newPage();
+        // ページのサイズを指定
+        await page.setViewport({width: 640, height: 350});
+        // HTMLファイルを読み込み、動的な値を注入する
+        // Handelebarsを使って動的な値を注入する
+        const template = Handlebars.compile(fs.readFileSync(__dirname+'/html-project/public/wotb.html', 'utf8'));
+        // dataを作成する必要がある。
+        const htmlContent = template(this);
+        // ページを読み込む
+        await page.setContent(htmlContent);
+        // CSSファイルを読み込む
+        const unreplacedCssContent = fs.readFileSync(__dirname+'/html-project/assets/css/style.css', 'utf8');
+        const cssContent = unreplacedCssContent
+            .replace("{{body.height}}", "350px")
+            .replace("{{backgroundImg}}", this.dataURI_background)
+            .replace("{{discord_role.color}}", this.discord_role.color);
+        // CSSをHTMLページに追加する
+        await page.addStyleTag({ content: cssContent });
+        // スクリーンショットを撮る
+        const screenshot = await page.screenshot({
+            type: 'png',
+            encoding: 'binary', // バイナリー形式で取得するためにencodingを設定
+            omitBackground: true
+        });
+        //await page.screenshot({ path: 'example.png', omitBackground: true});
+        await browser.close();
         console.log('The image was created successfully!');
-        return image;
+        return screenshot;
     }
     /**
      * Discordだけのプロフィール画像
