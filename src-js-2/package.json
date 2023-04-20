@@ -29,7 +29,6 @@
     "ini": "^3.0.0",
     "mysql2": "^2.3.3",
     "node-cron": "^3.0.2",
-    "node-html-to-image": "^3.2.4",
     "puppeteer": "^18.0.5",
     "request": "^2.88.2"
   }
