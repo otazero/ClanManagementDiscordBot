@@ -61,7 +61,7 @@ class makeProfileImg{
 
     async #createProfile({ htmlFile, type, height }) {
         // ブラウザを起動する
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch(env_config);
         // ページを作成する
         const page = await browser.newPage();
         // ページのサイズを設定する
