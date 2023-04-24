@@ -1,3 +1,12 @@
+/**
+ * @file index.js
+ * @brief メイン処理
+ * @date 2021-03-06
+ * @version 1.00
+ * @details
+ * DiscordBotのメイン処理
+ */
+
 const { Client , Intents, MessageEmbed, Permissions, MessageButton, Modal, TextInputComponent, MessageActionRow} = require('discord.js');
 const {Daily, Monthly} = require(`./runbot/main.js`);
 const {fixedTermReport, kickCall} = require(`./messages/message.js`);
@@ -46,6 +55,8 @@ const commands = (()=>{
 
 'use strict';
 
+
+// ログイン時のログ表示
 client.once('ready', async() => {
     /* コマンドを登録 */
     const data = (()=>{
@@ -61,6 +72,8 @@ client.once('ready', async() => {
 });
 
 
+// ログインされたら実行
+// 定期実行の処理
 client.on('ready', async() => {
     cron.schedule('0 0 3 * * *', async() => {
         // TODO: スクレイピング→入退室の確認など
@@ -116,6 +129,8 @@ client.on('ready', async() => {
     });
 });
 
+
+// メッセージの処理
 client.on("messageCreate", (message) => {
     if (message.author.bot) { //botからのmessageを無視
         return;
@@ -125,6 +140,8 @@ client.on("messageCreate", (message) => {
     }
 });
 
+
+// インタラクション(スラッシュコマンド)の処理
 client.on("interactionCreate", async (interaction) => {
     // console.log("\n\n\n\n\n");
     if(interaction.isCommand()) {
@@ -168,6 +185,8 @@ client.on("interactionCreate", async (interaction) => {
     
 });
 
+
+// ログイン
 client.login(token)
     .catch(console.error);
 
