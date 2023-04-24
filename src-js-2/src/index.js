@@ -141,6 +141,10 @@ client.on("messageCreate", (message) => {
     }
     if (message.content === 'hihi') {
         console.log("hihi");
+        message.reply('hihi');
+    }
+    if (message.content === 'ping') {
+        message.reply('pong');
     }
 });
 
