@@ -76,7 +76,9 @@ client.once('ready', async() => {
 // 定期実行の処理
 client.on('ready', async() => {
     cron.schedule('0 0 3 * * *', async() => {
-        // TODO: スクレイピング→入退室の確認など
+        /** 
+         * @todo スクレイピング→入退室の確認など
+         */
         console.log("3時だよ!全員集合！");
         const daily = new Daily();
         await daily.main();
@@ -117,7 +119,9 @@ client.on('ready', async() => {
         scheduled: true,
         timezone: "Asia/Tokyo"
     });
-    // アクテビティ更新
+    /**
+     * @todo 月初めに実行。キックメンバーの報告
+     */
     cron.schedule('30 58 8 * * *', async() => {
     // cron.schedule('30 12 15 * * *', async() => {
         const mom = new Monthly();
