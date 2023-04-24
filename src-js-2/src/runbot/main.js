@@ -125,6 +125,19 @@ class Monthly{
     }
     get kickMemText(){
         let text = "";
+
+        //const startTime = performance.now();
+        // kickmemをIGNでソートする
+        this.kickMem.sort((a, b)=>{
+            const a_small_ign = a.ign.toLowerCase();
+            const b_small_ign = b.ign.toLowerCase();
+            if(a_small_ign < b_small_ign) return -1;
+            if(a_small_ign > b_small_ign) return 1;
+            return 0;
+        });
+        //const endTime = performance.now();
+        //console.log(`localeCompare() method: ${endTime - startTime}ms`);
+
         this.kickMem.forEach((user)=>{
             text += `> ・${invalidSymbol(user.ign)}\n`;
         });
