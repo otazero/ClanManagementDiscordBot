@@ -19,25 +19,25 @@ class makeProfileImg{
             name: result.d_name,
             ign: result.d_ign,
             role: this.#whatRole(result.d_r_id),
-            enter_year: result.d_enter_at.getFullYear(),
-            enter_month: result.d_enter_at.getMonth()+1,
-            enter_day: result.d_enter_at.getDate()
+            enter_year: result.d_enter_at ? result.d_enter_at.getFullYear() : null,
+            enter_month: result.d_enter_at ? result.d_enter_at.getMonth()+1 : null,
+            enter_day: result.d_enter_at ? result.d_enter_at.getDate() : null
         };
 
         const thunder = {
             ign: result.t_ign,
             role: this.#whatRole(result.t_r_id),
-            enter_year: result.t_enter_at.getFullYear(),
-            enter_month: result.t_enter_at.getMonth()+1,
-            enter_day: result.t_enter_at.getDate()
+            enter_year: result.t_enter_at ? result.t_enter_at.getFullYear() : null,
+            enter_month: result.t_enter_at ? result.t_enter_at.getMonth()+1 : null,
+            enter_day: result.t_enter_at ? result.t_enter_at.getDate() : null
         };
 
         const wotb = {
             ign: result.w_ign,
             role: this.#whatRole(result.w_r_id),
-            enter_year: result.w_enter_at.getFullYear(),
-            enter_month: result.w_enter_at.getMonth()+1,
-            enter_day: result.w_enter_at.getDate()
+            enter_year: result.w_enter_at ? result.w_enter_at.getFullYear() : null,
+            enter_month: result.w_enter_at ? result.w_enter_at.getMonth()+1 : null,
+            enter_day: result.w_enter_at ? result.w_enter_at.getDate() : null
         };
 
         const date = new Date();
