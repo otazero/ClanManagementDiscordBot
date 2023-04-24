@@ -212,6 +212,9 @@ module.exports = {
                         files: [attachment]
                     });
                 }
+                else{
+                    await interaction.reply("プロフィールが登録されていません。反映まで1日ほどかかります。\n__**2日以上**経っても反映されない場合は、管理者にお問い合わせください。__");
+                }
             }
             else if(interaction.options.getSubcommand() === `activity`){
                 await interaction.reply("工事中");
