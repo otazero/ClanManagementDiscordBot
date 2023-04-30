@@ -374,7 +374,7 @@ class OperationDatabase{
      */
     static specialUser(){
         return {
-            async setSpecialUser(ign){
+            async addSpecialUser(ign){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
@@ -385,13 +385,9 @@ class OperationDatabase{
                 if( mycon ){
                     mycon.end();
                 }
-                console.log("result");
-                console.log(result);
-                console.log("gomi");
-                console.log(gomi);
                 return result;
             },
-            async deleteSpecialUser(ign){
+            async removeSpecialUser(ign){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
@@ -402,10 +398,6 @@ class OperationDatabase{
                 if( mycon ){
                     mycon.end();
                 }
-                console.log("result");
-                console.log(result);
-                console.log("gomi");
-                console.log(gomi);
                 return result;
             },
             async getSpecialUsers(){
