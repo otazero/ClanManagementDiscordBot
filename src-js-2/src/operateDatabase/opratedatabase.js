@@ -558,21 +558,35 @@ class OperationDatabase{
      * @returns {thunderClass[]} 
      */
     static async LetLeftUser(thunderUser, discordUser){
+        // データベース接続
+        let mycon = null;
+        try {
+            mycon = await mysql.createConnection(db_setting);
+        }catch(e){
+            console.log(e);
+        }
         const now = new Date();
         now.setDate(now.getDate() - Number(config.KickMember.progress));
-        const kickMembers = thunderUser.map((tuser)=>{
+        const kickMembers = await Promise.all(thunderUser.map(async (tuser)=>{
             //　アクティビティがX以下の人を抽出
             if(tuser.nowactive <= config.KickMember.minactivity){
                 // 入隊後N日数経過したフレンズのみ適用します
                 if(tuser.enter_at.getDateType < now){
                     // Discordにもいません
                     if(!(discordUser.some((duser)=>{return duser.ign===tuser.ign}))){
-                        return tuser;
+                        // 特例処置社ではありません
+                        const [result, gomi1] = await mycon.query(`SELECT COUNT(*) AS count_is FROM t_wt_members WHERE t_ign = "${tuser.ign}" and t_special_treatment = true`);
+                        if(!Number(result[0].count_is)){
+                            return tuser;
+                        };
                     }
                 }
             }
-        }).filter(Boolean);
-        return kickMembers;
+        }));
+        if( mycon ){
+            mycon.end();
+        }
+        return kickMembers.filter(Boolean);
     }
 
     
