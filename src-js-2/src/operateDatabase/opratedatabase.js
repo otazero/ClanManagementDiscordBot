@@ -373,8 +373,8 @@ class OperationDatabase{
      * 特例処置者のデータベース操作
      */
     static specialUser(){
-        class operationSpecialUser {
-            static async setSpecialUser(ign){
+        return {
+            async setSpecialUser(ign){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
@@ -390,8 +390,8 @@ class OperationDatabase{
                 console.log("gomi");
                 console.log(gomi);
                 return result;
-            }
-            static async deleteSpecialUser(ign){
+            },
+            async deleteSpecialUser(ign){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
@@ -407,21 +407,19 @@ class OperationDatabase{
                 console.log("gomi");
                 console.log(gomi);
                 return result;
-            }
-            static async getSpecialUser(){
+            },
+            async getSpecialUsers(){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
                 }catch(e){
                     console.log(e);
                 }
-                const [result, gomi] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_special_treatment = true`);
+                const [result, gomi] = await mycon.query(`SELECT t_ign as ign FROM t_wt_members WHERE t_special_treatment = true`);
                 if( mycon ){
                     mycon.end();
                 }
-                const thunderUsers = await this.#dbToUsers(result);
-                console.log(thunderUsers);
-                return  thunderUsers;
+                return  result;
             }
         }
     }
