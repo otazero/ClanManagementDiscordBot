@@ -50,21 +50,34 @@ module.exports = {
                 // サブコマンドの判定
                 if(interaction.options.getSubcommand() === `add`){
                     const thunderIGN = interaction.options.getString(`ign`);
-                    console.log(thunderIGN);
-                    await interaction.reply({ content: '特例処置者の追加を行います。', ephemeral: true });
+                    const result = await operationSpecialUser.addSpecialUser(thunderIGN);
+                    if(result.affectedRows == 1 && result.changedRows == 1){
+                        await interaction.reply({ content: `**${thunderIGN}**を特例処置対象者に変更しました。`, ephemeral: true });
+                    }
+                    else if(result.affectedRows == 1 && result.changedRows == 0){
+                        await interaction.reply({ content: `**${thunderIGN}**は既に特例処置対象者です。`, ephemeral: true });
+                    }
+                    else{
+                        await interaction.reply({ content: `**${thunderIGN}**の追加に失敗しました。\nIGNが異なるか、データベースの更新がまだです。`, ephemeral: true });
+                    }
                 }
                 else if(interaction.options.getSubcommand() === `remove`){
                     const thunderIGN = interaction.options.getString(`ign`);
-                    await interaction.reply({ content: '特例処置者の削除を行います。', ephemeral: true });
+                    const result = await operationSpecialUser.removeSpecialUser(thunderIGN);
+                    if(result.affectedRows == 1 && result.changedRows == 1){
+                        await interaction.reply({ content: `**${thunderIGN}**を特例処置対象者から削除しました。`, ephemeral: true });
+                    }
+                    else if(result.affectedRows == 1 && result.changedRows == 0){
+                        await interaction.reply({ content: `**${thunderIGN}**は特例処置対象者ではありません。`, ephemeral: true });
+                    }
+                    else{
+                        await interaction.reply({ content: `**${thunderIGN}**の削除に失敗しました。\nIGNが異なる可能性があります。`, ephemeral: true });
+                    }
                 }
                 else if(interaction.options.getSubcommand() === `list`){
                     const specialUsers = await operationSpecialUser.getSpecialUsers();
-                    console.log(specialUsers);
-                    const memtxt = ">>> ";
-                    specialUsers.forEach(user => {
-                        memtxt += `・${user.ign}\n`;
-                    });
-                    console.log(memtxt);
+                    const specialUserList = specialUsers.map(user => `・${user.ign}`).join('\n');
+                    const memtxt = `>>> ${specialUserList}`;
                     await interaction.reply({ content: `特例処置者の一覧を表示します。\n${memtxt}`, ephemeral: true });
                 }
             }
