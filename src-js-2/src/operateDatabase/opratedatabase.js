@@ -368,6 +368,54 @@ class OperationDatabase{
 
         return result;
     }
+
+    /**
+     * 特例処置者のデータベース操作
+     */
+    static specialUser(){
+        class operationSpecialUser {
+            static async setSpecialUser(discordid, ign){
+                let mycon = null;
+                try {
+                    mycon = await mysql.createConnection(db_setting);
+                }catch(e){
+                    console.log(e);
+                }
+                const [result, gomi] = await mycon.query(`UPDATE d_discord_members SET d_upign_flag = true, d_subign = '${ign}' WHERE d_user_id = ${BigInt(discordid)}`);
+                if( mycon ){
+                    mycon.end();
+                }
+                return result;
+            }
+            static async deleteSpecialUser(discordid){
+                let mycon = null;
+                try {
+                    mycon = await mysql.createConnection(db_setting);
+                }catch(e){
+                    console.log(e);
+                }
+                const [result, gomi] = await mycon.query(`UPDATE d_discord_members SET d_upign_flag = false, d_subign = '' WHERE d_user_id = ${BigInt(discordid)}`);
+                if( mycon ){
+                    mycon.end();
+                }
+                return result;
+            }
+            static async getSpecialUser(){
+                let mycon = null;
+                try {
+                    mycon = await mysql.createConnection(db_setting);
+                }catch(e){
+                    console.log(e);
+                }
+                const [result, gomi] = await mycon.query(`SELECT t_ign  FROM t_wt_members WHERE `);
+                if( mycon ){
+                    mycon.end();
+                }
+                return result;
+            }
+        }
+    }
+
     /**
      * 
      * @param {*} dbusers SELECTの一個目のResultをぶち込む 
