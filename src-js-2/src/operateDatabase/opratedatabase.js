@@ -374,30 +374,38 @@ class OperationDatabase{
      */
     static specialUser(){
         class operationSpecialUser {
-            static async setSpecialUser(discordid, ign){
+            static async setSpecialUser(ign){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
                 }catch(e){
                     console.log(e);
                 }
-                const [result, gomi] = await mycon.query(`UPDATE d_discord_members SET d_upign_flag = true, d_subign = '${ign}' WHERE d_user_id = ${BigInt(discordid)}`);
+                const [result, gomi] = await mycon.query(`UPDATE t_wt_members SET t_special_treatment = true WHERE t_ign = '${ign}'`);
                 if( mycon ){
                     mycon.end();
                 }
+                console.log("result");
+                console.log(result);
+                console.log("gomi");
+                console.log(gomi);
                 return result;
             }
-            static async deleteSpecialUser(discordid){
+            static async deleteSpecialUser(ign){
                 let mycon = null;
                 try {
                     mycon = await mysql.createConnection(db_setting);
                 }catch(e){
                     console.log(e);
                 }
-                const [result, gomi] = await mycon.query(`UPDATE d_discord_members SET d_upign_flag = false, d_subign = '' WHERE d_user_id = ${BigInt(discordid)}`);
+                const [result, gomi] = await mycon.query(`UPDATE t_wt_members SET t_special_treatment = false WHERE t_ign = '${ign}'`);
                 if( mycon ){
                     mycon.end();
                 }
+                console.log("result");
+                console.log(result);
+                console.log("gomi");
+                console.log(gomi);
                 return result;
             }
             static async getSpecialUser(){
@@ -407,17 +415,19 @@ class OperationDatabase{
                 }catch(e){
                     console.log(e);
                 }
-                const [result, gomi] = await mycon.query(`SELECT t_ign  FROM t_wt_members WHERE `);
+                const [result, gomi] = await mycon.query(`SELECT * FROM t_wt_members WHERE t_special_treatment = true`);
                 if( mycon ){
                     mycon.end();
                 }
-                return result;
+                const thunderUsers = await this.#dbToUsers(result);
+                console.log(thunderUsers);
+                return  thunderUsers;
             }
         }
     }
 
     /**
-     * 
+     * ユーザークラスを作成する
      * @param {*} dbusers SELECTの一個目のResultをぶち込む 
      */
     static async #dbToUsers(dbusers){
