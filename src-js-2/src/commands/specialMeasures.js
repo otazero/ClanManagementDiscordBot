@@ -46,6 +46,7 @@ module.exports = {
         if (interaction.commandName === 'special') {
             if(interaction.member.roles.cache.some((role) => {return role.id === clanmasterRole})){
                 const operationSpecialUser = OperationDatabase.specialUser(); 
+                
                 // サブコマンドの判定
                 if(interaction.options.getSubcommand() === `add`){
                     const thunderIGN = interaction.options.getString(`ign`);
@@ -57,7 +58,14 @@ module.exports = {
                     await interaction.reply({ content: '特例処置者の削除を行います。', ephemeral: true });
                 }
                 else if(interaction.options.getSubcommand() === `list`){
-                    await interaction.reply({ content: '特例処置者の一覧を表示します。', ephemeral: true });
+                    const specialUsers = await operationSpecialUser.getSpecialUsers();
+                    console.log(specialUsers);
+                    const memtxt = ">>> ";
+                    specialUsers.forEach(user => {
+                        memtxt += `・${user.ign}\n`;
+                    });
+                    console.log(memtxt);
+                    await interaction.reply({ content: `特例処置者の一覧を表示します。\n${memtxt}`, ephemeral: true });
                 }
             }
             else{
