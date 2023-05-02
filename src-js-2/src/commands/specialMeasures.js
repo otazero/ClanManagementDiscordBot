@@ -44,11 +44,10 @@ module.exports = {
     },
     async execute_commands(interaction, client) {
         if (interaction.commandName === 'special') {
-            if(interaction.member.roles.cache.some((role) => {return role.id === clanmasterRole})){
-                const operationSpecialUser = OperationDatabase.specialUser(); 
-                
-                // サブコマンドの判定
-                if(interaction.options.getSubcommand() === `add`){
+            const operationSpecialUser = OperationDatabase.specialUser(); 
+            // サブコマンドの判定
+            if(interaction.options.getSubcommand() === `add`){
+                if(interaction.member.roles.cache.some((role) => {return role.id === clanmasterRole})){
                     const thunderIGN = interaction.options.getString(`ign`);
                     const result = await operationSpecialUser.addSpecialUser(thunderIGN);
                     if(result.affectedRows == 1 && result.changedRows == 1){
@@ -61,7 +60,12 @@ module.exports = {
                         await interaction.reply({ content: `**${thunderIGN}**の追加に失敗しました。\nIGNが異なるか、データベースの更新がまだです。`, ephemeral: true });
                     }
                 }
-                else if(interaction.options.getSubcommand() === `remove`){
+                else{
+                    await interaction.reply({ content: '管理者限定コマンドのため無効な操作です。', ephemeral: true });
+                }
+            }
+            else if(interaction.options.getSubcommand() === `remove`){
+                if(interaction.member.roles.cache.some((role) => {return role.id === clanmasterRole})){
                     const thunderIGN = interaction.options.getString(`ign`);
                     const result = await operationSpecialUser.removeSpecialUser(thunderIGN);
                     if(result.affectedRows == 1 && result.changedRows == 1){
@@ -74,15 +78,15 @@ module.exports = {
                         await interaction.reply({ content: `**${thunderIGN}**の削除に失敗しました。\nIGNが異なる可能性があります。`, ephemeral: true });
                     }
                 }
-                else if(interaction.options.getSubcommand() === `list`){
-                    const specialUsers = await operationSpecialUser.getSpecialUsers();
-                    const specialUserList = specialUsers.map(user => `・${user.ign}`).join('\n');
-                    const memtxt = `>>> ${specialUserList}`;
-                    await interaction.reply({ content: `特例処置者の一覧を表示します。\n${memtxt}`, ephemeral: true });
+                else{
+                    await interaction.reply({ content: '管理者限定コマンドのため無効な操作です。', ephemeral: true });
                 }
             }
-            else{
-                await interaction.reply({ content: '管理者限定コマンドのため無効な操作です。', ephemeral: true });
+            else if(interaction.options.getSubcommand() === `list`){
+                const specialUsers = await operationSpecialUser.getSpecialUsers();
+                const specialUserList = specialUsers.map(user => `・${user.ign}`).join('\n');
+                const memtxt = `>>> ${specialUserList}`;
+                await interaction.reply({ content: `特例処置者の一覧を表示します。\n${memtxt}`, ephemeral: false });
             }
         }
     }
