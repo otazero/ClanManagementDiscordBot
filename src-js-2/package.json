@@ -1,6 +1,6 @@
 {
   "name": "cran-management-discordbot",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "クランの管理自動化BOT",
   "main": "index.js",
   "scripts": {
