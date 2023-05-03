@@ -2,6 +2,7 @@ version: "3"
 services:
   bot:
     container_name: my-discord-bot
+    restart: always
     build: .
     ports:
       - "3000:3000"
@@ -12,11 +13,13 @@ services:
   db:
     image: mysql:8.0
     container_name: my-mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       MYSQL_DATABASE: clandb
       MYSQL_USER: ${USER}
       MYSQL_PASSWORD: ${USER_PASSWORD}
+      LANG: 'ja_JP.UTF-8'
     volumes:
       - db_data:/var/lib/mysql
 volumes:
