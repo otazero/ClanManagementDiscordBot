@@ -50,3 +50,8 @@ exit
 ```
 docker exec -it my-mysql mysql -u <ユーザー名> -p <パスワード> <データベース名>
 ```
+
+### ダミーデータの移動
+```
+docker exec -i my-mysql mysql -u otazero -p<パスワード> clandb < dump.txt
+```
