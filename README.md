@@ -28,3 +28,19 @@ docker run -it --rm -p 8080:8080 my-discordbot
 ```
 docker stop my-discordbot
 ```
+
+### 動いてるコンテナを表示
+
+```
+docker ps
+```
+
+### コンテナ内のシェル
+```
+docker exec -it <コンテナID> sh
+```
+
+### コンテナ内シェルから抜ける
+```
+exit
+```
