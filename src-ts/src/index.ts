@@ -82,7 +82,7 @@ client.on('messageCreate', async (message: Message) => {
         }
         if(mycon){
             //データベースから存在フラグがTrueのだけ受け取ります
-            const [oldusers, gomi] = await mycon.query(`SELECT * FROM d_discord_members`);
+            const [oldusers, gomi]: [mysql.RowDataPacket[], mysql.FieldPacket[]]  = await mycon.query(`SELECT * FROM d_discord_members`);
             console.log(oldusers);
         }
         if(mycon){
