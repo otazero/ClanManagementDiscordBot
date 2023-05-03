@@ -55,3 +55,6 @@ docker exec -it my-mysql mysql -u <ユーザー名> -p <パスワード> <デー
 ```
 docker exec -i my-mysql mysql -u otazero -p<パスワード> clandb < dump.txt
 ```
+
+### Arm対応Chrominiumインストール方法
+https://qiita.com/kwbt/items/420b3d02456fe24307ec
