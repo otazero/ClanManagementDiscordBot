@@ -6,6 +6,7 @@
 import { GatewayIntentBits, Client, Partials, Message, ActivityType } from 'discord.js'
 import fs from 'fs'
 import ini from 'ini'
+import dotenv from 'dotenv'
 import mysql from 'mysql2/promise'
 
 const client = new Client({
@@ -22,8 +23,31 @@ const client = new Client({
     partials: [Partials.Message, Partials.Channel],
 });
 const CONFIG:{ [key : string] : any} = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
+dotenv.config();
 
 const TOKEN:string = CONFIG.Credentials.token;
+
+
+// DB接続設定
+interface DBSetting {
+    host: string;
+    user: string;
+    password: string;
+    database: string;
+    supportBigNumbers: boolean;
+    bigNumberStrings: boolean;
+}
+
+const db_setting: DBSetting = {
+    host: 'db',
+    user: process.env.USER!,
+    password: process.env.USER_PASSWORD!,
+    database: 'clandb',
+    supportBigNumbers: true,
+    bigNumberStrings: true,
+};
+
+console.log(db_setting);
 
 // ログイン時のログ表示
 client.once('ready', async() => {
@@ -48,6 +72,22 @@ client.on('messageCreate', async (message: Message) => {
     }
     if (message.content === 'ping') {
         message.reply('pong');
+    }
+    if (message.content === 'pong') {
+        let mycon: mysql.Connection | null = null;
+        try {
+            mycon = await mysql.createConnection(db_setting);
+        }catch(e){
+            console.log(e);
+        }
+        if(mycon){
+            //データベースから存在フラグがTrueのだけ受け取ります
+            const [oldusers, gomi] = await mycon.query(`SELECT * FROM d_discord_members`);
+            console.log(oldusers);
+        }
+        if(mycon){
+            mycon.end();
+        }
     }
 });
 
