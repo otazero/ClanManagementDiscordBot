@@ -38,9 +38,15 @@ docker ps
 ### コンテナ内のシェル
 ```
 docker exec -it <コンテナID> sh
+docker exec -it <コンテナID> /bin/bash
 ```
 
 ### コンテナ内シェルから抜ける
 ```
 exit
+```
+
+### コンテナ内MySQLにアクセス
+```
+docker exec -it my-mysql mysql -u <ユーザー名> -p <パスワード> <データベース名>
 ```
