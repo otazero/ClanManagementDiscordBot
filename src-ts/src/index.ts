@@ -4,6 +4,9 @@
  */
 
 import { GatewayIntentBits, Client, Partials, Message, ActivityType } from 'discord.js'
+import fs from 'fs'
+import ini from 'ini'
+import mysql from 'mysql2/promise'
 
 const client = new Client({
     intents: [
@@ -18,12 +21,7 @@ const client = new Client({
     ],
     partials: [Partials.Message, Partials.Channel],
 });
-
-import fs from 'fs'
-import ini from 'ini'
-
 const CONFIG:{ [key : string] : any} = ini.parse(fs.readFileSync('./config/config.ini', 'utf-8'));
-
 
 const TOKEN:string = CONFIG.Credentials.token;
 
