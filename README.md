@@ -14,3 +14,17 @@ src-js-2
 mysql -u root -p
 create database clandb;
 drop database clandb;
+
+### Dockerイメージのビルド
+```
+docker build -t my-discordbot .
+```
+
+### コンテナの実行
+```
+docker run -it --rm -p 8080:8080 my-discordbot
+```
+### 終了
+```
+docker stop my-discordbot
+```
