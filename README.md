@@ -58,3 +58,14 @@ docker exec -i my-mysql mysql -u otazero -p<パスワード> clandb < dump.txt
 
 ### Arm対応Chromiumインストール方法
 https://qiita.com/kwbt/items/420b3d02456fe24307ec
+
+
+### 絶対パス
+```
+pwd
+```
+
+### ローカルにコピー
+```
+docker cp <コンテナ名>:<コンテナ内のファイルパス> <ローカルマシンのファイルパス>
+```
