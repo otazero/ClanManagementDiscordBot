@@ -126,7 +126,7 @@ client.on('ready', async() => {
     // cron.schedule('30 12 15 * * *', async() => {
         const mom = new Monthly();
         await mom.main();
-        await kickCall(MessageEmbed, client, mom.kickMemText, callCenterCh, thunderRole, config);
+        await kickCall(MessageEmbed, client, mom.kickMemText, clanNewsCh, thunderRole, config);
     },{
         scheduled: true,
         timezone: "Asia/Tokyo"
