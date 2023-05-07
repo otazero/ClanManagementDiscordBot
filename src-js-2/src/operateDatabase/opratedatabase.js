@@ -19,6 +19,35 @@ const db_setting = {
     bigNumberStrings: true, // BigNumberを文字列として扱う
 };
 
+// SQLインジェクション対策
+const escape = (str) => {
+    if(typeof str !== 'string'){
+        return str;
+    }
+    return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, (char) => {
+        switch (char) {
+            case "\0":
+                return "\\0";
+            case "\x08":
+                return "\\b";
+            case "\x09":
+                return "\\t";
+            case "\x1a":
+                return "\\z";
+            case "\n":
+                return "\\n";
+            case "\r":
+                return "\\r";
+            case "\"":
+            case "'":
+            case "\\":
+            case "%":
+                return "\\"+char; // prepends a backslash to backslash, percent,
+                                    // and double/single quotes
+        }
+    });
+};
+
 class OperationDatabase{
     /**
      * 
@@ -330,7 +359,7 @@ class OperationDatabase{
                     }
                 })(user);
                 
-                await mycon.query(`UPDATE d_discord_members SET d_name = '${user.username}', d_nick = '${user.nick}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id}, r_id = ${user.role.main.id} WHERE d_user_id = ${BigInt(user.id)}`);
+                await mycon.query(`UPDATE d_discord_members SET d_name = '${escape(user.username)}', d_nick = '${escape(user.nick)}', d_ign = '${user.ign}', w_user_id = ${user.wotbClass.id}, t_user_id = ${user.thunderClass.id}, r_id = ${user.role.main.id} WHERE d_user_id = ${BigInt(user.id)}`);
                 return rightDiscordRole;
             }));
             
