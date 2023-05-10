@@ -69,3 +69,8 @@ pwd
 ```
 docker cp <コンテナ名>:<コンテナ内のファイルパス> <ローカルマシンのファイルパス>
 ```
+
+### キャッシュなしでBuild
+```
+docker-compose build --no-cache
+```
