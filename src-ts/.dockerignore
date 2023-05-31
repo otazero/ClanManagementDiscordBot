@@ -1,2 +1,11 @@
 # ローカルのnode_modulesを無視
 node_modules
+
+# sampleを無視
+.env.sample
+
+# chromiumのインストールファイルを無視
+chromiums
+
+# gitignoreを無視
+.gitignore
