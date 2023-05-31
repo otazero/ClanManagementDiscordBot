@@ -38,15 +38,27 @@ RUN apt-get update --allow-insecure-repositories \
         && rm -rf /var/lib/apt/lists/* ; \
     fi
 
-WORKDIR /app
+WORKDIR /usr/app
 
+# アーキテクチャの確認
+RUN echo $(uname -m) > /app/message2
+
+COPY . .
 # buildディレクトリを作成する
 RUN mkdir build
 
-COPY package*.json ./
-RUN npm install
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-COPY . .
+RUN npm install \
+    # Add user so we don't need --no-sandbox.
+    # same layer as npm install to keep re-chowned files from using up several hundred MBs more space
+    && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /usr/app
+
+# Run everything after as non-privileged user.
+USER pptruser
 
 # TypeScriptをコンパイル
 RUN npm run compile
