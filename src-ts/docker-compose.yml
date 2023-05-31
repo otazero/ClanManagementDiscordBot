@@ -21,6 +21,6 @@ services:
       MYSQL_PASSWORD: ${USER_PASSWORD}
       LANG: 'ja_JP.UTF-8'
     volumes:
-      - db_data:/var/lib/mysql
+      - ${MYSQL_MOUNT_DIR:-./data}:/var/lib/mysql
 volumes:
   db_data:
