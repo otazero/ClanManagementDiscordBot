@@ -41,7 +41,7 @@ RUN apt-get update --allow-insecure-repositories \
 WORKDIR /usr/app
 
 # アーキテクチャの確認
-RUN echo $(uname -m) > /app/message2
+RUN echo $(uname -m) > /usr/app/message2
 
 COPY . .
 # buildディレクトリを作成する
