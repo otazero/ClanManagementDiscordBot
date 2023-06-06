@@ -5,7 +5,7 @@ node_modules
 .env.sample
 
 # chromiumのインストールファイルを無視
-chromiums
+# chromiums
 
 # gitignoreを無視
 .gitignore
